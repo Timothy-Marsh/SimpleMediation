@@ -1,0 +1,51 @@
+---
+output: github_document
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# SimpleMediation
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+The goal of SimpleMediation is to implement simple linear mediation with bootstrapping to estimate the error.
+It provides functions the run simple mediation with bootstrapping.
+
+## Installation
+
+You can install the development version of SimpleMediation from a file, later GIt will be used:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("timothym/SimpleMediation")
+```
+
+## Usage
+
+Mediation is examining the impact of a variable (M) on the relationship between two others (X) and (Y).
+This package provides a function `simple_mediation()` to do this and give an estimate for the uncertainty in these relationships.
+
+
+```{r}
+x <- c(1,2,3,4,5,6,7)
+m <- c(1,2.3,4.2,4.9,5.6,6,6.7)
+y <- c(3.4,5.4,6.5,7.9,8,10,11)
+df <- data.frame(x,m,y)
+simple_mediation(df)
+```
+
+The returned values are the estimate of the total, direct, and indirect effects along with their bias and standard error.

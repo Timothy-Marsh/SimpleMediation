@@ -1,0 +1,16 @@
+Package: SimpleMediation
+Title: Simple Intro Package
+Version: 0.0.0.9000
+Authors@R: 
+    person("Timothy", "Marsh", , "mars1283@mylaurier.ca", role = c("aut", "cre"))
+Description: A small test package for simple mediation.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    boot,
+    stats
