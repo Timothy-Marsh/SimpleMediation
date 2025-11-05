@@ -1,7 +1,7 @@
 #' Run a simple Mediation
 #'
 #' @param df a vector of observations
-#' @param ... for some reason the boot package doesn't work without this, it accommodates additional arguments but does nothing
+#' @param samps The sample indices, as required by boot::boot()
 #'
 #' @return An estimate of the total, direct, and two estimates of the indirect effect in that order
 #' @export

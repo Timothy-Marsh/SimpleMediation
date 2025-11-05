@@ -4,12 +4,12 @@
 \alias{run_mediation}
 \title{Run a simple Mediation}
 \usage{
-run_mediation(df, ...)
+run_mediation(df, samps)
 }
 \arguments{
 \item{df}{a vector of observations}
 
-\item{...}{for some reason the boot package doesn't work without this, it accommodates additional arguments but does nothing}
+\item{samps}{The sample indices, as required by boot::boot()}
 }
 \value{
 An estimate of the total, direct, and two estimates of the indirect effect in that order
