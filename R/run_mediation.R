@@ -12,10 +12,9 @@
 #' y <- c(3.4,5.4,6.5,7.9,8,10,11)
 #' df <- data.frame(x,m,y)
 #' run_mediation(df)
-run_mediation <- function(df,...) {
+run_mediation <- function(df, samps) {
   n <- nrow(df)
 
-  samps <- sample(seq(1:n),n, replace = TRUE)
   use_samp <- df[samps,]
   x <- use_samp[,1]
   m <- use_samp[,2]
