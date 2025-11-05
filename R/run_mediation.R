@@ -1,4 +1,4 @@
-#' Run a simple Mediation
+#' Run a simple linear Mediation
 #'
 #' @param df a vector of observations
 #' @param samps The sample indices, as required by boot::boot()
@@ -13,23 +13,21 @@
 #' df <- data.frame(x,m,y)
 #' run_mediation(df)
 run_mediation <- function(df, samps) {
-  n <- nrow(df)
 
   use_samp <- df[samps,]
   x <- use_samp[,1]
   m <- use_samp[,2]
   y <- use_samp[,3]
-  MX.mod <- stats::lm(m ~ x)
-  a <- MX.mod$coefficients[[2]]
-  YX.mod <- stats::lm(y ~ x)
-  c <- YX.mod$coefficients[[2]]
-  YMX.mod <- stats::lm(y ~ m + x)
-  b <- YMX.mod$coefficients[[2]]
-  c_prime <- YMX.mod$coefficients[[3]]
+  mediator_model <- stats::lm(m ~ x)
+  a <- mediator_model$coefficients[[2]]
+  response_model <- stats::lm(y ~ x)
+  c <- response_model$coefficients[[2]]
+  full_model <- stats::lm(y ~ m + x)
+  b <- full_model$coefficients[[2]]
+  direct_effect <- full_model$coefficients[[3]]
 
   indirect_effect <- a*b
-  indirect_effect_v2 <- c - c_prime
-  direct_effect <- c_prime
+  indirect_effect_v2 <- c - direct_effect
   total_effect <- indirect_effect + direct_effect
 
   return(c(total_effect, direct_effect, indirect_effect, indirect_effect_v2))
