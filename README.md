@@ -13,8 +13,7 @@ simple mediation with bootstrapping.
 
 ## Installation
 
-You can install the development version of SimpleMediation from a file,
-later GIt will be used:
+You can install the development version of SimpleMediation GitHub:
 
 ``` r
 # install.packages("devtools")
@@ -26,7 +25,7 @@ devtools::install_github("timothym/SimpleMediation")
 Mediation is examining the impact of a variable (M) on the relationship
 between two others (X) and (Y). This package provides a function
 `simple_mediation()` to do this and give an estimate for the uncertainty
-in these relationships.
+in these relationships, and the covariance values between the estimates.
 
 ``` r
 x <- c(1,2,3,4,5,6,7)
