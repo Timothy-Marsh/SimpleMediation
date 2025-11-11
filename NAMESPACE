@@ -2,3 +2,4 @@
 
 export(run_mediation)
 export(simple_mediation)
+export(ts_simple_resid_boot)

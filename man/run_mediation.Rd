@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_mediation.R
 \name{run_mediation}
 \alias{run_mediation}
-\title{Run a simple Mediation}
+\title{Run a simple linear Mediation}
 \usage{
 run_mediation(df, samps)
 }
@@ -15,7 +15,7 @@ run_mediation(df, samps)
 An estimate of the total, direct, and two estimates of the indirect effect in that order
 }
 \description{
-Run a simple Mediation
+Run a simple linear Mediation
 }
 \examples{
 x <- c(1,2,3,4,5,6,7)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simple_mediation.R
 \name{simple_mediation}
 \alias{simple_mediation}
-\title{Performs simple mediation}
+\title{Perform simple linear mediation on variables X, M, and Y}
 \usage{
 simple_mediation(df)
 }
@@ -11,9 +11,10 @@ simple_mediation(df)
 }
 \value{
 Values for the total effect, direct effect, the indirect effect calculated in two different ways, and standard error for each of these values.
+Also returns a covariance matrix for those values.
 }
 \description{
-Performs simple mediation
+Perform simple linear mediation on variables X, M, and Y
 }
 \examples{
 x <- c(1,2,3,4,5,6,7)
