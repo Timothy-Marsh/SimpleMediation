@@ -11,17 +11,15 @@
 #' ts_simple_resid_boot(x)
 
 ts_simple_resid_boot <- function(df) {
-  time <- df[,1]
-  x <- df[,2]
+  x <- df[,1]
 
-  #function to estimate the time series (and identify what type of time series it is)
   ts_model <- auto.arima(x)
 
-  resids <- checkresiduals(ts_model)
+  check_res <- checkresiduals(ts_model)
 
-  ts_plot <- plot(ts_model)
+  resids <- residuals(ts_model)
 
   #boot function to run on that model
-
+  boot::tsboot(resids, statistic = run_boot_ts, R = 500, sim = "model")
 
 }
