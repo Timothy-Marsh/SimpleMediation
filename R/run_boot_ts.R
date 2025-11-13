@@ -13,6 +13,8 @@
 
 run_boot_ts <- function(x, samps) {
 
+  boot_samps <- x[samps,]
 
+  
 
 }
