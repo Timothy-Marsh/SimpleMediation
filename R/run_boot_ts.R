@@ -16,5 +16,7 @@ run_boot_ts <- function(x, samps) {
   boot_samps <- x[samps,]
 
   
+  # to be returned, the mean of the process and the the prediction
+  c(mean(boot_samps), predict(boot_samps, n.ahead = 5))
 
 }
