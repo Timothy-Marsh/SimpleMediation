@@ -14,6 +14,7 @@
 ts_simple_resid_boot <- function(df, n) {
   # add something here to check the type of data given and do different things with it
   x <- df
+  R <- 50
 
   ts_model <- arima(x, order = c(n,0,0))
 
@@ -25,30 +26,38 @@ ts_simple_resid_boot <- function(df, n) {
   resids <- residuals(ts_model)
   resids <- resids - mean(resids)
 
-  coefs <- ts_model$coef
+  mod_mean <- ts_model$coef[n+1]
+  coefs <- ts_model$coef[1:n]
+  
   
   ts_mean <- mean(x)
 
   #boot function to run on that model
   #tsboot(resids, statistic = run_boot_ts, R = 500, sim = "model")
   #boot_resids <- boot::boot(data = resids, statistic = run_boot_ts, R = 500)
-  R <- 500
+
   boot_resids <- run_boot_ts(resids, R)
   
   #final bootstrapped iteration is something like this
-  
+
   # this should be a data frame? which each column as a bootstrap replicate of values in the AR series
   #ts_booted <- ts_mean + coefs %*% x + boot_resids$t
-  
+
   # initializing the data frame
   boot_reps <- data.frame(matrix(nrow = length(x), ncol = R))
-  # a series of loops to build the R bootstrap replicates of the time series itself
+  
+  # since AR models depend on previous entries, we initialize it to be the observations
   for (i in seq(1:R)) {
-    for (j in seq(1:length(x))) {
-      boot_reps[i,j] <- ts_mean + coefs[1] * boot_reps[i,j-1] + boot_resids[i,j]
-    }
+    boot_reps[,i] <- x
   }
   
-  ts_booted
+  # a series of loops to build the R bootstrap replicates of the time series itself
+  for (i in seq(1:R)) {
+    for (j in ((n+1):length(x))) {
+      boot_reps[j,i] <- ts_mean + sum(coefs * boot_reps[,i][(j-n-1):(j-1)]) + boot_resids[j,i]
+    }
+  }
+
+  boot_reps
 
 }
