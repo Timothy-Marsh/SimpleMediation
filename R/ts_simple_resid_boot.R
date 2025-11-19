@@ -1,7 +1,8 @@
-#' Perform bootstrapping on the residuals of a time series process
+#' Perform bootstrapping on the residuals of a time series process and return the specified number of bootstrap replicates of the time series
 #'
-#' @param df A data frame with a value changing over time
+#' @param x A vectors of time series data
 #' @param n An integer indicating the degree of AR model given
+#' @param R An integer for the number of bootstrap replicates used
 #'
 #' @return An estimate of the time series, and the bootstrap results
 #'
@@ -9,18 +10,12 @@
 #'
 #' @examples
 #' x <- rnorm(100)
-#' ts_simple_resid_boot(x)
+#' ts_simple_resid_boot(x, 2, 50)
 
-ts_simple_resid_boot <- function(df, n) {
+ts_simple_resid_boot <- function(x, n, R) {
   # add something here to check the type of data given and do different things with it
-  x <- df
-  R <- 50
 
   ts_model <- arima(x, order = c(n,0,0))
-
-  # interesting data but unnecessary for our purposes here I think?
-  #  Would it be useful to have some kind of output like this for the hospital project?
-  #check_res <- checkresiduals(ts_model)
 
   # find and centre the residuals of the time series model
   resids <- residuals(ts_model)
@@ -29,19 +24,10 @@ ts_simple_resid_boot <- function(df, n) {
   mod_mean <- ts_model$coef[n+1]
   coefs <- ts_model$coef[1:n]
   
-  
   ts_mean <- mean(x)
 
-  #boot function to run on that model
-  #tsboot(resids, statistic = run_boot_ts, R = 500, sim = "model")
-  #boot_resids <- boot::boot(data = resids, statistic = run_boot_ts, R = 500)
-
+  # call a function to bootstrap the residuals
   boot_resids <- run_boot_ts(resids, R)
-  
-  #final bootstrapped iteration is something like this
-
-  # this should be a data frame? which each column as a bootstrap replicate of values in the AR series
-  #ts_booted <- ts_mean + coefs %*% x + boot_resids$t
 
   # initializing the data frame
   boot_reps <- data.frame(matrix(nrow = length(x), ncol = R))
@@ -59,5 +45,4 @@ ts_simple_resid_boot <- function(df, n) {
   }
 
   boot_reps
-
 }
