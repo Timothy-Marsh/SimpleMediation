@@ -12,36 +12,49 @@
 #' y <- runif(100)
 #' df <- data.frame(x,y)
 #' lags(df,3)
-lags <- function(df, n) {
+lags <- function(formula, df) {
+  # can use the rlang package
+  library(rlang)
+  
+  lhs <- f_lhs(formula)
+  rhs <- f_rhs(formula)
+  
+  # n is the number of lags desired
+  n <- f_rhs(formula)[[3]]
+  
+  # this works to detect if the left hand side value is in the data frame!
+  if(as.character(lhs) %in% colnames(df)){ 
+    lhs_data <- df[,which(colnames(df) == lhs)]
+  } else {
+    paste("Variable", lhs, "not found")
+  }
+  
+  if(as.character(rhs[[2]]) %in% colnames(df)){ 
+    rhs_data <- df[,which(colnames(df) == rhs[[2]])]
+  } else {
+    paste("Variable", rhs, "not found")
+  }
+  
+  #
+  #formula[[1]] <- quote(cor)
+  
+  #formula(formula)
+  #lm(formula, df)
+  
+  
   library(dplyr)
-  #probably put this as a function (then can call the function for X and Y)
-  if ("x" %in% colnames(df)) {
-    x <- df$x
-  } else if ("X" %in% colnames(df)) {
-    x <- df$X
-  } else{
-    x <- df[,1]
-  }
-  
-  if ("y" %in% colnames(df)) {
-    y <- df$y
-  } else if ("Y" %in% colnames(df)) {
-    y <- df$Y
-  } else{
-    y <- df[,2]
-  }
-  
-  lagged_vals <- data.frame(matrix(nrow = length(y), ncol = n))
-  
+
+  lagged_vals <- data.frame(matrix(nrow = length(lhs_data), ncol = n))
+
   for (i in seq(1:n)) {
-    lagged_vals[,i] <- lag(x,i)
+    lagged_vals[,i] <- lag(rhs_data,i)
   }
-  
-  lagged_vals$y <- y
-  lagged_vals$x <- x
-  
+
+  lagged_vals$lhs_data <- lhs_data
+  lagged_vals$rhs_data <- rhs_data
+
   lagged_vals <- na.omit(lagged_vals)
-  
-  lagged_model <- lm(y ~ ., data = lagged_vals)
+
+  lagged_model <- lm(lhs_data ~ ., data = lagged_vals)
   lagged_model
 }

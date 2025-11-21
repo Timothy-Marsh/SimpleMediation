@@ -21,9 +21,10 @@ ts_simple_resid_boot <- function(x, n, R) {
   resids <- residuals(ts_model)
   resids <- resids - mean(resids)
 
-  mod_mean <- ts_model$coef[n+1]
+  # create variables for the mean of the time series and the coefficients of the model
+  mod_intercept <- ts_model$coef[n+1]
   coefs <- ts_model$coef[1:n]
-  
+  coefs
   ts_mean <- mean(x)
 
   # call a function to bootstrap the residuals
@@ -31,16 +32,16 @@ ts_simple_resid_boot <- function(x, n, R) {
 
   # initializing the data frame
   boot_reps <- data.frame(matrix(nrow = length(x), ncol = R))
-  
-  # since AR models depend on previous entries, we initialize it to be the observations
+
+  # since AR models depend on previous entries, we initialize it to be the initial observations
   for (i in seq(1:R)) {
     boot_reps[,i] <- x
   }
-  
+
   # a series of loops to build the R bootstrap replicates of the time series itself
   for (i in seq(1:R)) {
     for (j in ((n+1):length(x))) {
-      boot_reps[j,i] <- ts_mean + sum(coefs * boot_reps[,i][(j-n-1):(j-1)]) + boot_resids[j,i]
+      boot_reps[j,i] <- ts_mean + sum(coefs * rev(boot_reps[,i][(j-n-1):(j-1)])) + boot_resids[j,i]
     }
   }
 
