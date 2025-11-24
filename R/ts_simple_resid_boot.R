@@ -41,9 +41,12 @@ ts_simple_resid_boot <- function(x, n, R) {
   # a series of loops to build the R bootstrap replicates of the time series itself
   for (i in seq(1:R)) {
     for (j in ((n+1):length(x))) {
-      boot_reps[j,i] <- ts_mean + sum(coefs * rev(boot_reps[,i][(j-n-1):(j-1)])) + boot_resids[j,i]
+      boot_reps[j,i] <- ts_mean + sum(coefs * rev(boot_reps[,i][(j-1-(n-1)):(j-1)])) + boot_resids[j,i]
     }
   }
 
+  #list(boot_reps, boot_resids, ts_mean, coefs)
+  
   boot_reps
+  
 }
