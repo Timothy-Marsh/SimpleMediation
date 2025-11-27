@@ -13,11 +13,10 @@
 #' df <- data.frame(x,m,y)
 #' run_mediation(df)
 run_mediation <- function(df, samps) {
-
-  use_samp <- df[samps,]
-  x <- use_samp[,1]
-  m <- use_samp[,2]
-  y <- use_samp[,3]
+  use_samp <- df[samps, ]
+  x <- use_samp[, 1]
+  m <- use_samp[, 2]
+  y <- use_samp[, 3]
   mediator_model <- stats::lm(m ~ x)
   a <- mediator_model$coefficients[[2]]
   response_model <- stats::lm(y ~ x)
@@ -26,7 +25,7 @@ run_mediation <- function(df, samps) {
   b <- full_model$coefficients[[2]]
   direct_effect <- full_model$coefficients[[3]]
 
-  indirect_effect <- a*b
+  indirect_effect <- a * b
   indirect_effect_v2 <- c - direct_effect
   total_effect <- indirect_effect + direct_effect
 

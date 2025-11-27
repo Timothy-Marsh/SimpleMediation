@@ -15,39 +15,33 @@
 lags <- function(formula, df) {
   # can use the rlang package
   library(rlang)
-  
+
   lhs <- f_lhs(formula)
   rhs <- f_rhs(formula)
-  
+
   # n is the number of lags desired
   n <- f_rhs(formula)[[3]]
-  
+
   # this works to detect if the left hand side value is in the data frame!
-  if(as.character(lhs) %in% colnames(df)){ 
-    lhs_data <- df[,which(colnames(df) == lhs)]
+  if (as.character(lhs) %in% colnames(df)) {
+    lhs_data <- df[, which(colnames(df) == lhs)]
   } else {
     paste("Variable", lhs, "not found")
   }
-  
-  if(as.character(rhs[[2]]) %in% colnames(df)){ 
-    rhs_data <- df[,which(colnames(df) == rhs[[2]])]
+
+  if (as.character(rhs[[2]]) %in% colnames(df)) {
+    rhs_data <- df[, which(colnames(df) == rhs[[2]])]
   } else {
     paste("Variable", rhs, "not found")
   }
-  
-  #
-  #formula[[1]] <- quote(cor)
-  
-  #formula(formula)
-  #lm(formula, df)
-  
-  
+
+
   library(dplyr)
 
   lagged_vals <- data.frame(matrix(nrow = length(lhs_data), ncol = n))
 
   for (i in seq(1:n)) {
-    lagged_vals[,i] <- lag(rhs_data,i)
+    lagged_vals[, i] <- lag(rhs_data, i)
   }
 
   lagged_vals$lhs_data <- lhs_data
