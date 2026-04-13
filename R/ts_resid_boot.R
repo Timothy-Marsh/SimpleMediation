@@ -4,15 +4,16 @@
 #' @param n An integer indicating the degree of AR model given
 #' @param R An integer for the number of bootstrap replicates used
 #'
-#' @return An estimate of the time series, and the bootstrap results
+#' @return A named list which includes an estimate of the time series, and the bootstrap results
 #'
 #' @export
 #'
 #' @examples
 #' x <- rnorm(100)
 #' ts_simple_resid_boot(x, 2, 50)
-ts_simple_resid_boot <- function(x, n, R) {
-  # add something here to check the type of data given and do different things with it
+
+ts_resid_boot <- function(x, n, R) {
+  # add something here to check the type of data given and do different things with it, not necessarily needed depending on what other functions are created
 
   ts_model <- arima(x, order = c(n, 0, 0))
 
@@ -23,7 +24,6 @@ ts_simple_resid_boot <- function(x, n, R) {
   # create variables for the mean of the time series and the coefficients of the model
   mod_intercept <- ts_model$coef[n + 1]
   coefs <- ts_model$coef[1:n]
-  coefs
   ts_mean <- mean(x)
 
   # call a function to bootstrap the residuals
@@ -46,5 +46,6 @@ ts_simple_resid_boot <- function(x, n, R) {
 
   # list(boot_reps, boot_resids, ts_mean, coefs)
 
-  boot_reps
+  # return a named list with the model and the boostrap replications
+  list(model = ts_model, bootReps = boot_reps)
 }
