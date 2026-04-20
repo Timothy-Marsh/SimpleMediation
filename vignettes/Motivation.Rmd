@@ -1,0 +1,36 @@
+---
+title: "Motivation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Motivation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimpleMediation)
+```
+
+```{r, include = FALSE}
+# some notes that are more background/for my own reference
+
+# What is the goal of this thesis?
+# 
+# To look at the mediation relationship when each variable involved is a time series, and examine if this is a better way to model those relationships.
+# 
+# Thesis Statement:
+# 
+# A median relationship is a more effective way to model complex interactions between three or more variables, than using traditional methods would be.
+```
+
+
+The goal of this thesis is to examine if using mediation analysis on three time series is a more effective way of analyzing their interactions than other methods. 
+
+Previously mediation has largely been used in a binary context, this thesis will apply the concepts of mediation to non-binary contexts specifically to a time series context. There are two elements to be looked at; does a mediation context improve the interpretability and allow us to make better insights into the relationships present, and does it improve the performance of the models. To answer these there will be theory on showing the models are valid in a mediation context and how they can be interpreted, and the performance of these models will be compared against their normal counterparts to show if incorporating mediation concepts improves the modelling capabilities.
