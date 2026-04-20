@@ -22,5 +22,5 @@ simple_mediation <- function(df) {
   rownames(bootstrap_covariance) <- c("Total Effect", "Direct Effect", "Indirect Effect", "Indirect Effect")
   colnames(bootstrap_covariance) <- c("Total Effect", "Direct Effect", "Indirect Effect", "Indirect Effect")
 
-  list(bootstrap_results, bootstrap_covariance)
+  list(boots = bootstrap_results, covMatrix = bootstrap_covariance)
 }

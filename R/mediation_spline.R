@@ -1,28 +1,26 @@
 #' A helper function to run a single iteration of spline mediation, which will then be used to perform bootstrapping on
-single_spline <- function(df, samps) {
+single_spline <- function(df, samps, knots = list(seq(min(x),max(x), length = 5, k))) {
   use_samp <- df[samps, ]
   x <- use_samp[, 1]
   m <- use_samp[, 2]
   y <- use_samp[, 3]
-  
-  knots <- 5
   
   #basisSplines <- mgcv::s(x, bs = "bs", k = 5)
   
   #mediator_model <- lm(m ~ basisSplines, data = use_samp)
   
   # create the models and get the needed coefficients from them
-  mediator_model <- mgcv::gam(m ~ s(x, bs = "bs", k = knots), family = gaussian(), data = use_samp)
+  mediator_model <- mgcv::gam(m ~ s(x, bs = "bs", k = k), family = gaussian(), data = use_samp, knots = knots)
   
   phi <- mediator_model$coefficients
   
-  response_model <- mgcv::gam(y ~ s(x, bs = "bs", k = knots), family = gaussian(), data = use_samp)
+  response_model <- mgcv::gam(y ~ s(x, bs = "bs", k = k), family = gaussian(), data = use_samp, knots = knots)
   
-  full_model <- mgcv::gam(y ~ s(x, bs = "bs", k = knots) + m)
+  full_model <- mgcv::gam(y ~ s(x, bs = "bs", k = k) + m, knots = knots)
   
   beta <- full_model$coefficients["m"]
   
-  theta <- full_model$coefficients[3:(knots+1)]
+  theta <- full_model$coefficients[3:(k+1)]
   
   # need to get the smooth values used in the gams to calculate the direct and indirect effects. <- these should be the basis splines used I think
   
