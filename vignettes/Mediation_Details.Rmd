@@ -53,7 +53,7 @@ Y_t &= \gamma_0(\gamma_0 Y_{t-2} + \gamma_1 M_{t-2} + \gamma_2 X_{t-2} + \epsilo
 \end{align}
 $$
 
-From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$.
+From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$. The direct effect of $X_{t-2}$ on $Y_t$ is $\gamma_0 \gamma_2 + \gamma_2 \alpha$, and the indirect effect of $X_{t-2}$ on $Y_t$ is $\gamma_1 \beta_1$.
 
 We also examine the autocovariance of an ARX(1) model. If we use the above definition the ARX(1) model is: $X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t$, and suppose that $X_0 \sim WN(0, \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}))$ and we find the autocovariance:
 
@@ -74,5 +74,6 @@ $$
 Cov(Z_t,X_t) &= Cov(Z_t, \phi X_{t-1} + \psi Z_{t-1} + \epsilon_{z,t}) \\
 &= \phi Cov(Z_t,X_{t-1}) + \psi Cov(Z_t,Z_{t-1}) + Cov(Z_t,\epsilon_{z,t}) \\
 &= \phi Cov(Z_t, X_{t-1}) + \psi\gamma_z(1) \\
+&= \phi(\phi Cov(Z_t,X_{t-2}) + \psi \gamma_z (2)) + \psi \gamma_z (1)
 \end{align}
 $$
