@@ -1,0 +1,78 @@
+---
+title: "Mediation_Details"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mediation_Details}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimpleMediation)
+```
+
+This package is code for my thesis on mediation in a time series context. This vignette details the theory behind mediation and the functions that I am writing for the thesis. This vignette will help link the theory with the specific functions that I am writing.
+
+# Basic mediation functions
+
+The functions `run_mediation`, and `simple_mediation` are both for normal mediation on continuous variables. `run_mediation` runs a simple mediation on three variables, and `simple_mediation` uses it to perform bootstrapping in a simple mediation context and gives an estimate for the variance and covariance of the mediation.
+
+# Mediation for ARX models
+
+We denote an ARX(1) model as:
+
+$$
+X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t
+$$
+
+Where: $\epsilon_t \sim N(0,\sigma^2)$
+
+For mediation we define $X$ to be AR(1) and $M$ and $Y$ to be ARX(1):
+
+$$
+\begin{align}
+X_t &= \alpha X_{t-1} + \epsilon_{t,X}\\
+M_t &= \beta_0 M_{t-1} +\beta_1 X_{t-1} +\epsilon_{t,M} \\
+Y_t &= \gamma_0 Y_{t-1} + \gamma_1 M_{t-1} + \gamma_2 X_{t-1} + \epsilon_{t,Y}
+\end{align}
+$$
+
+We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
+
+$$
+\begin{align}
+Y_t &= \gamma_0(\gamma_0 Y_{t-2} + \gamma_1 M_{t-2} + \gamma_2 X_{t-2} + \epsilon_{t-1,Y}) + \gamma_1(\beta_0 M_{t-2} +\beta_1 X_{t-2} +\epsilon_{t-1,M}) + \gamma_2 (\alpha X_{t-2} + \epsilon_{t-1,X}) + \epsilon_{t,Y} \\
+&= \gamma_0^2 Y_{t-2} + (\gamma_0 + \beta_0) \gamma_1 M_{t-2} + (\gamma_0 \gamma_2 + \gamma_1 \beta_1 + \gamma_2 \alpha)X_{t-2} + (\gamma_0 \epsilon_{t-1,Y} + \gamma_1 \epsilon_{t-1,M} + \gamma_2 \epsilon_{t-1,X} + \epsilon_{t,Y})
+\end{align}
+$$
+
+From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$.
+
+We also examine the autocovariance of an ARX(1) model. If we use the above definition the ARX(1) model is: $X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t$, and suppose that $X_0 \sim WN(0, \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}))$ and we find the autocovariance:
+
+$$
+\begin{align}
+\gamma (0) &= \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}) \\
+\gamma(1) &= Cov(X_{t+1},X_t) \\
+&= Cov(\phi X_t + \psi Z_t + \epsilon_t, X_t) \\
+&= \phi Cov(X_t, X_t) + \psi Cov(Z_t,X_t) + Cov(\epsilon_t, X_t) \\
+&= \phi \gamma(0) + \psi Cov(Z_t,X_t)
+\end{align}
+$$
+
+This calculation depends on the value of $Cov(Z_t,X_t)$:
+
+$$
+\begin{align}
+Cov(Z_t,X_t) &= Cov(Z_t, \phi X_{t-1} + \psi Z_{t-1} + \epsilon_{z,t}) \\
+&= \phi Cov(Z_t,X_{t-1}) + \psi Cov(Z_t,Z_{t-1}) + Cov(Z_t,\epsilon_{z,t}) \\
+&= \phi Cov(Z_t, X_{t-1}) + \psi\gamma_z(1) \\
+\end{align}
+$$
