@@ -95,6 +95,8 @@ So we get an initial value for $M$ of $M_0 \sim \left( 0, \left( \frac{1}{1-\bet
 
 Following a similar argument we get an initial value for $Y$ of $Y_0 = \left( 0 , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$.
 
+We note that the values of $Y$ are dependent on two previous values of $X$, and so we also need an initial value for $Y_1$. If we say that the initial value of $Y_0$ is $Y_0 = \left( 0 , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$. Then the value of $Y_1$ is  $X_1 \sim \left( \gamma_0 (\sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) ) , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$
+
 ### Autocovariances
 
 We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
