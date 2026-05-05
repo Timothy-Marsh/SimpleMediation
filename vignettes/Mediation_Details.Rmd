@@ -34,28 +34,7 @@ $$
 
 Where: $\epsilon_t \sim N(0,\sigma^2)$
 
-For mediation we define $X$ to be AR(1) and $M$ and $Y$ to be ARX(1):
-
-$$
-\begin{align}
-X_t &= \alpha X_{t-1} + \epsilon_{t,X}\\
-M_t &= \beta_0 M_{t-1} +\beta_1 X_{t-1} +\epsilon_{t,M} \\
-Y_t &= \gamma_0 Y_{t-1} + \gamma_1 M_{t-1} + \gamma_2 X_{t-1} + \epsilon_{t,Y}
-\end{align}
-$$
-
-We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
-
-$$
-\begin{align}
-Y_t &= \gamma_0(\gamma_0 Y_{t-2} + \gamma_1 M_{t-2} + \gamma_2 X_{t-2} + \epsilon_{t-1,Y}) + \gamma_1(\beta_0 M_{t-2} +\beta_1 X_{t-2} +\epsilon_{t-1,M}) + \gamma_2 (\alpha X_{t-2} + \epsilon_{t-1,X}) + \epsilon_{t,Y} \\
-&= \gamma_0^2 Y_{t-2} + (\gamma_0 + \beta_0) \gamma_1 M_{t-2} + (\gamma_0 \gamma_2 + \gamma_1 \beta_1 + \gamma_2 \alpha)X_{t-2} + (\gamma_0 \epsilon_{t-1,Y} + \gamma_1 \epsilon_{t-1,M} + \gamma_2 \epsilon_{t-1,X} + \epsilon_{t,Y})
-\end{align}
-$$
-
-From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$. The direct effect of $X_{t-2}$ on $Y_t$ is $\gamma_0 \gamma_2 + \gamma_2 \alpha$, and the indirect effect of $X_{t-2}$ on $Y_t$ is $\gamma_1 \beta_1$.
-
-We also examine the autocovariance of an ARX(1) model. If we use the above definition the ARX(1) model is: $X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t$, and suppose that $X_0 \sim WN(0, \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}))$ and we find the autocovariance:
+We can examine the autocovariance of an ARX(1) model. If we use the above definition the ARX(1) model is: $X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t$, and suppose that $X_0 \sim WN(0, \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}))$ and we find the autocovariance:
 
 $$
 \begin{align}
@@ -77,3 +56,54 @@ Cov(Z_t,X_t) &= Cov(Z_t, \phi X_{t-1} + \psi Z_{t-1} + \epsilon_{z,t}) \\
 &= \phi(\phi Cov(Z_t,X_{t-2}) + \psi \gamma_z (2)) + \psi \gamma_z (1)
 \end{align}
 $$
+
+## ARX in Mediation
+
+For mediation we define $X$ to be AR(1) and $M$ and $Y$ to be ARX(1):
+
+$$
+\begin{align}
+X_t &= \alpha X_{t-1} + \epsilon_{t,X}\\
+M_t &= \beta_0 M_{t-1} +\beta_1 X_{t-1} +\epsilon_{t,M} \\
+Y_t &= \gamma_0 Y_{t-1} + \gamma_1 M_{t-1} + \gamma_2 X_{t-1} + \epsilon_{t,Y}
+\end{align}
+$$
+
+### Initial Values
+
+For an AR(1) model the initial point $X_0$ follows a distribution with mean 0, and variance $\sigma^2/(1-\phi^2)$. In the mediation context we will need initial values for $X$, $M$, and $Y$.
+
+Since $X$ is an AR(1) model, we define the initial value to be:
+
+$$
+X_0\sim \left( 0,\frac{\sigma^2}{(1-\phi^2)} \right)
+$$
+
+We also need an initial value for $M$, which is an ARX(1) process. The mean of the initial value is still 0, but the variance is now also dependent on $X$.
+
+$$
+\begin{align}
+Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
+&= Var( \epsilon_{t,M} + \beta_0 \epsilon_{t-1,M} + \beta_0^2 \epsilon_{t-2,M} + \cdots +
+\beta_1 \epsilon_{t-1,X} + \beta_1^2 \epsilon_{t-2,X} + \cdots ) \\
+&= \sigma^2_M (1 + \beta_0 + \beta_0^2+ \cdots) + \sigma^2_X (\beta_1 + \beta_1^2 + \cdots) \\
+&= \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right)
+\end{align}
+$$ 
+
+So we get an initial value for $M$ of $M_0 \sim \left( 0, \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right)$.
+
+Following a similar argument we get an initial value for $Y$ of $Y_0 = \left( 0 , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$.
+
+### Autocovariances
+
+We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
+
+$$
+\begin{align}
+Y_t &= \gamma_0(\gamma_0 Y_{t-2} + \gamma_1 M_{t-2} + \gamma_2 X_{t-2} + \epsilon_{t-1,Y}) + \gamma_1(\beta_0 M_{t-2} +\beta_1 X_{t-2} +\epsilon_{t-1,M}) + \gamma_2 (\alpha X_{t-2} + \epsilon_{t-1,X}) + \epsilon_{t,Y} \\
+&= \gamma_0^2 Y_{t-2} + (\gamma_0 + \beta_0) \gamma_1 M_{t-2} + (\gamma_0 \gamma_2 + \gamma_1 \beta_1 + \gamma_2 \alpha)X_{t-2} + (\gamma_0 \epsilon_{t-1,Y} + \gamma_1 \epsilon_{t-1,M} + \gamma_2 \epsilon_{t-1,X} + \epsilon_{t,Y})
+\end{align}
+$$
+
+From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$. The direct effect of $X_{t-2}$ on $Y_t$ is $\gamma_0 \gamma_2 + \gamma_2 \alpha$, and the indirect effect of $X_{t-2}$ on $Y_t$ is $\gamma_1 \beta_1$.
