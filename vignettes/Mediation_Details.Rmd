@@ -69,6 +69,14 @@ Y_t &= \gamma_0 Y_{t-1} + \gamma_1 M_{t-1} + \gamma_2 X_{t-1} + \epsilon_{t,Y}
 \end{align}
 $$
 
+We also define the errors from these models to be:
+
+$$
+\epsilon_{t,X} \sim N(0,\sigma^2_X)\\
+\epsilon_{t,M} \sim N(0,\sigma^2_M)\\
+\epsilon_{t,Y} \sim N(0,\sigma^2_Y)
+$$
+
 ### Initial Values
 
 For an AR(1) model the initial point $X_0$ follows a distribution with mean 0, and variance $\sigma^2/(1-\phi^2)$. In the mediation context we will need initial values for $X$, $M$, and $Y$.
@@ -76,7 +84,7 @@ For an AR(1) model the initial point $X_0$ follows a distribution with mean 0, a
 Since $X$ is an AR(1) model, we define the initial value to be:
 
 $$
-X_0\sim N \left( 0,\frac{\sigma^2}{(1-\phi^2)} \right)
+X_0\sim N \left( 0,\frac{\sigma^2_X}{(1-\phi^2)} \right)
 $$
 
 We also need an initial value for $M$, which is an ARX(1) process. The mean of the initial value is still 0, but the variance is now also dependent on $X$.
@@ -99,6 +107,127 @@ We note that the values of $Y$ are dependent on two previous values of $X$, and 
 
 ### Autocovariances
 
+#### ACF of X
+
+We note that $X_t$ follows that AR(1) process and so it has the autocovariance $\gamma_x(h)$:
+
+$$
+\gamma_x(h) = \sigma^2_X \frac{\phi^{|h|}}{(1-\phi^2)}
+$$
+
+#### ACF of M
+
+Now looking for the autocovariance of $M_t$ we start with $\gamma_m(0)$ which is the variance of $M_t$ $$
+\gamma_m(0) = \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right)
+$$
+
+Then $\gamma_m(1)$ is:
+
+$$
+\begin{align}
+\gamma_m(1) &= Cov(M_t,M_{t-1}) \\
+&= Cov(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{M,t} ,M_{t-1}) \\
+&= \beta_0Cov(M_{t-1}, M_{t-1}) + \beta_1 Cov(X_{t-1}, M_{t-1}) \\
+&= \beta_0 \gamma_m(0) + \beta_1 Cov(X_{t-1}, M_{t-1}) 
+\end{align}
+$$
+
+We also find the $\gamma_m(2)$: $$
+\begin{align}
+\gamma_m(2) &= Cov(M_t, M_{t-2}) \\
+&= \beta_0Cov(M_{t-1}, M_{t-2}) + \beta_1 Cov(X_{t-1}, M_{t-2})\\
+&= \beta_0 \gamma_m(1) + \beta_1 \alpha Cov(X_{t-2}, M_{t-2})
+\end{align}
+$$
+
+And $\gamma_m(3)$:
+
+$$
+\begin{align}
+\gamma_m(3) &= Cov(M_t, M_{t-3}) \\
+&= \beta_0 \gamma_m(2) + \beta_1 Cov(X_{t-1}, M_{t-3}) \\
+&= \beta_0 \gamma_m(2) + \beta_1 \alpha^2 Cov(X_{t-3}, M_{t-3})
+\end{align}
+$$
+
+We now have enough observations to generalize this to the $\gamma_m(h)$ case:
+
+$$
+\begin{align}
+\gamma_m(h) &= \beta_0^h \gamma_m(0) +  \sum^h_{i=0} \alpha^i \beta_1 Cov(X_{t-i+1}, M_{t-i+1})
+\end{align}
+$$
+
+If we assume that the covariance is constant, this becomes:
+
+$$
+\begin{align}
+\gamma_m(h) &= \beta_0^h \gamma_m(0) + \beta_1 Cov(X_{t}, M_{t}) \sum^h_{i=0} \alpha^i\\
+&= \beta_0^h \gamma_m(0) + \beta_1 Cov(X_{t}, M_{t}) \cdot \frac{1}{1-\alpha}
+\end{align}
+$$
+
+This relies on knowing the covariance between $X_t$ and $M_t$.
+
+#### ACF of Y
+
+Using a similar approach to the one for the autocovariance of $M_t$ we start with $\gamma_y(0)$. We note that here the variables $\gamma_0$, $\gamma_1$, and $\gamma_2$ are changed to $\eta_0$, $\eta_1$, and $\eta_2$ to prevent confusion:
+
+$$
+\gamma_y(0) = \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right)
+$$
+
+We also find $\gamma_y(1)$:
+
+$$
+\begin{align}
+\gamma_y(1) &= \eta_0 Cov(Y_{t-1},Y_{t-1}) + \eta_1 Cov(M_{t-1}, Y_{t-1}) + \eta_2 Cov(X_{t-1}, Y_{t-1}) \\
+&= \eta_0 \gamma_y(0) + \eta_1 Cov(M_{t-1}, Y_{t-1}) + \eta_2 Cov(X_{t-1}, Y_{t-1})
+\end{align}
+$$
+
+And $\gamma_y(2)$:
+
+$$
+\begin{align}
+\gamma_y(2) &= \eta_0 Cov(Y_{t-1},Y_{t-2}) + \eta_1 Cov(M_{t-1}, Y_{t-2}) + \eta_2 Cov(X_{t-1}, Y_{t-2}) \\
+&= \eta_0 \gamma_y(1) + \eta_1 \beta_0 Cov(M_{t-2},Y_{t-2}) + (\beta_1 \eta_1 + \eta_2 \alpha) Cov(X_{t-2},Y_{t-2})
+\end{align}
+$$
+
+And $\gamma_y(3)$:
+$$
+\begin{align}
+\gamma_y(3) &= \eta_0\gamma_y(2) + \eta_1 Cov(M_{t-1}, Y_{t-3}) + \eta_2 Cov(X_{t-1}, Y_{t-3}) \\
+&= \eta_0\gamma_y(2) + \eta_1(\beta_0Cov(M_{t-2},Y_{t-3}) + \beta_1 Cov(X_{t-2},Y_{t-3})) + \eta_2 \alpha^2 Cov(X_{t-3}, Y_{t-3}) \\
+&= \eta_0 \gamma_y(2) + \eta_1\beta_0^2 Cov(M_{t-3}, Y_{t-3}) + (\eta_1\beta_1[\beta_0+\alpha]+\eta_2\alpha^2) Cov(X_{t-3}, Y_{t-3})
+\end{align}
+$$
+
+We are beginning to see a pattern emerge, which one more iteration will make much more obvious:
+
+$$
+\begin{align}
+\gamma_y(4) &= \eta_0 \gamma_y(3) + \eta_1 Cov(M_{t-1}, Y_{t-4}) + \eta_2 Cov(X_{t-1}, Y_{t-4}) \\
+&= \eta_0 \gamma_y(3) + \eta_1 \beta_0^3 Cov(M_{t-4}, Y_{t-4}) + (\eta_1\beta_1[\beta_0^2+\beta_0\alpha+\alpha^2]+\eta_2\alpha^3)Cov(X_{t-4},Y_{t-4})
+\end{align}
+$$
+
+From this we can get the generalization:
+
+$$
+\begin{align}
+\gamma_y(h) &= \eta_0\gamma_y(h-1) + \eta_1\beta_0^hCov(M_{t-h},Y_{t-h}) + \left( [\beta_0^{h-2} + \beta_0^{h-3}\alpha + \cdots + \beta_0\alpha^{h-3} + \alpha^{h-2}] + \eta_2 \alpha^{h-1} \right) Cov(X_{t-h}, Y_{t-h}) \\
+\gamma_y(h) &= \eta_0\gamma_y(h-1) + \eta_1\beta_0^hCov(M_{t-h},Y_{t-h}) + \left( \frac{\beta_0^{h-1}-\alpha^{h-1}}{\beta_0 - \alpha} + \eta_2 \alpha^{h-1} \right) Cov(X_{t-h}, Y_{t-h})
+\end{align}
+$$
+
+### Covariances between X, M, and Y
+
+We note that these values all directly rely on $Cov(X_t,M_t)$, $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$.
+
+### Interpretation of direct effect
+
 We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
 
 $$
@@ -119,7 +248,7 @@ We note that there is no completely direct effect from $X_{t-2}$ to $Y_t$, in th
 We can summarize the total effect of $X_{t-2}$ on $Y_t$ in the following chart:
 
 | Total Effect | $\gamma_2 \alpha + \gamma_0 \gamma_2 + \gamma_1 \beta_1$ |
-|----|----|
+|------------------------------------|------------------------------------|
 | self-mediated direct effect | $\gamma_2 \alpha$ |
 | cross-mediated direct effect | $\gamma_0 \gamma_2$ |
 | Indirect effect/mediated effect | $\gamma_1 \beta_1$ |
