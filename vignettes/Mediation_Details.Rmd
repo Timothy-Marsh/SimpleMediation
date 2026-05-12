@@ -226,6 +226,30 @@ $$
 
 We note that these values all directly rely on $Cov(X_t,M_t)$, $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$.
 
+There are two possibilities here. If we assume that all the covariances are the same then:
+
+$$
+\begin{align}
+Cov(X_t,M_t) &= Cov(X_0,M_0) \\
+&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right) \\
+&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right) \\
+&= \frac{\beta_1^2}{(1-\alpha^2)(1-\beta_1^2)} \sigma^2_X
+\end{align}
+$$
+
+Since $Cov(\sigma^2_X,\sigma^2_M)=0$.
+
+If the assumption of constant covariances does not hold then we have the following:
+
+$$
+\begin{align}
+Cov(X_t,M_t) &= \alpha^t Cov(X_0,M_t) \\
+&= \alpha^t (\beta_0Cov(X_0,M_{t-1}) + \beta_1 Cov(X_0,X_{t-1})) \\
+&= \alpha^t\beta_0 Cov(X_0,M_0) + \beta_1 \sum_{i=1}^{t-1} \beta_0^i\gamma_x(t-i) \\
+&= \alpha^t\beta_0 \left( \frac{\beta_1^2}{(1-\alpha^2)(1-\beta_1^2)} \sigma^2_X \right) + \beta_1 \sum_{i=1}^{t-1} \beta_0^i\gamma_x(t-i)
+\end{align}
+$$
+
 ### Interpretation of direct effect
 
 We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
