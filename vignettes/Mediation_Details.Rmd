@@ -65,9 +65,17 @@ $$
 \begin{align}
 X_t &= \alpha X_{t-1} + \epsilon_{t,X}\\
 M_t &= \beta_0 M_{t-1} +\beta_1 X_{t-1} +\epsilon_{t,M} \\
-Y_t &= \gamma_0 Y_{t-1} + \gamma_1 M_{t-1} + \gamma_2 X_{t-1} + \epsilon_{t,Y}
+Y_t &= \eta_0 Y_{t-1} + \eta_1 M_{t-1} + \eta_2 X_{t-1} + \epsilon_{t,Y}
 \end{align}
 $$
+
+In this context, since $X_t$, $M_t$, and $Y_t$ are all AR based models we also define $\alpha$, $\beta_0$, and $\eta_0$ to be bounded between -1 and 1:
+
+$$
+\alpha,\beta_0,\eta_0 \in (-1,1)
+$$
+
+It is reasonable for us to assume that each of these process is stationary. While many time series are not actually stationary, there are a wide variety of techniques that transform a non-stationary time series into a stationary one, it is reasonable for us to assume that when using this process the starting time series can be turned into stationary ones.
 
 We also define the errors from these models to be:
 
@@ -101,9 +109,9 @@ $$
 
 So we get an initial value for $M$ of $M_0 \sim N \left( 0, \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right)$.
 
-Following a similar argument we get an initial value for $Y$ of $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$.
+Following a similar argument we get an initial value for $Y$ of $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$.
 
-We note that the values of $Y$ are dependent on two previous values of $X$, and so we also need an initial value for $Y_1$. If we say that the initial value of $Y_0$ is $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$. Then the value of $Y_1$ is $Y_1 \sim N \left( \gamma_0 Var(Y_0) + \gamma_1 Var(M_0) +\gamma_2 Var(X_0), \sigma^2_Y \left( \frac{1}{1-\gamma_0^2} \right) + \sigma^2_M \left( \frac{\gamma_1^2}{1-\gamma_1^2} \right) + \sigma^2_X \left( \frac{\gamma_2^2}{1-\gamma_2^2} \right) \right)$
+We note that the values of $Y$ are dependent on two previous values of $X$, and so we also need an initial value for $Y_1$. If we say that the initial value of $Y_0$ is $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$. Then the value of $Y_1$ is $Y_1 \sim N \left( \eta_0 Var(Y_0) + \eta_1 Var(M_0) +\eta_2 Var(X_0), \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$
 
 ### Autocovariances
 
@@ -154,7 +162,7 @@ We now have enough observations to generalize this to the $\gamma_m(h)$ case:
 
 $$
 \begin{align}
-\gamma_m(h) &= \beta_0^h \gamma_m(0) +  \sum^h_{i=0} \alpha^i \beta_1 Cov(X_{t-i+1}, M_{t-i+1})
+\gamma_m(h) &= \beta_0^h \gamma_m(0) +  \sum^h_{i=1} \alpha^{i-1} \beta_1 Cov(X_{t-i}, M_{t-i})
 \end{align}
 $$
 
@@ -171,7 +179,7 @@ This relies on knowing the covariance between $X_t$ and $M_t$.
 
 #### ACF of Y
 
-Using a similar approach to the one for the autocovariance of $M_t$ we start with $\gamma_y(0)$. We note that here the variables $\gamma_0$, $\gamma_1$, and $\gamma_2$ are changed to $\eta_0$, $\eta_1$, and $\eta_2$ to prevent confusion:
+Using a similar approach to the one for the autocovariance of $M_t$ we start with $\gamma_y(0)$:
 
 $$
 \gamma_y(0) = \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right)
@@ -195,8 +203,7 @@ $$
 \end{align}
 $$
 
-And $\gamma_y(3)$:
-$$
+And $\gamma_y(3)$: $$
 \begin{align}
 \gamma_y(3) &= \eta_0\gamma_y(2) + \eta_1 Cov(M_{t-1}, Y_{t-3}) + \eta_2 Cov(X_{t-1}, Y_{t-3}) \\
 &= \eta_0\gamma_y(2) + \eta_1(\beta_0Cov(M_{t-2},Y_{t-3}) + \beta_1 Cov(X_{t-2},Y_{t-3})) + \eta_2 \alpha^2 Cov(X_{t-3}, Y_{t-3}) \\
@@ -250,32 +257,53 @@ Cov(X_t,M_t) &= \alpha^t Cov(X_0,M_t) \\
 \end{align}
 $$
 
+Assuming constant covariances then we also find the covariances $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$ to be:
+
+$$
+\begin{align}
+Cov(X_t,Y_t) &= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
+&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right),  \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
+&= \frac{\eta_2^2}{(1-\alpha^2)(1-\eta_2^2)} \sigma^2_X
+\end{align}
+$$
+
+and:
+
+$$
+\begin{align}
+Cov(M_t,Y_t) &= Cov \left( \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
+&= Cov \left(  \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right), \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) \right) + Cov \left( \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right), \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)\\
+&= \left( \frac{\eta_1^2}{(1-\beta^2_0)(1-\eta_1^2)} \right) Cov(\sigma^2_M, \sigma^2_M) + \left( \frac{\beta_1^2\eta_2^2}{(1-\beta_1^2)(1-\eta^2_2)} \right) Cov(\sigma^2_X,\sigma^2_X) \\
+&= \left( \frac{\eta_1^2}{(1-\beta^2_0)(1-\eta_1^2)} \right) \sigma^2_M + \left( \frac{\beta_1^2\eta_2^2}{(1-\beta_1^2)(1-\eta^2_2)} \right) \sigma^2_X
+\end{align}
+$$
+
 ### Interpretation of direct effect
 
 We cannot use the same method we did for simple mediation since substituting in the values for $X_{t-1}$ and $M_{t-1}$ gets us:
 
 $$
 \begin{align}
-Y_t &= \gamma_0(\gamma_0 Y_{t-2} + \gamma_1 M_{t-2} + \gamma_2 X_{t-2} + \epsilon_{t-1,Y}) + \gamma_1(\beta_0 M_{t-2} +\beta_1 X_{t-2} +\epsilon_{t-1,M}) + \gamma_2 (\alpha X_{t-2} + \epsilon_{t-1,X}) + \epsilon_{t,Y} \\
-&= \gamma_0^2 Y_{t-2} + (\gamma_0 + \beta_0) \gamma_1 M_{t-2} + (\gamma_0 \gamma_2 + \gamma_1 \beta_1 + \gamma_2 \alpha)X_{t-2} + (\gamma_0 \epsilon_{t-1,Y} + \gamma_1 \epsilon_{t-1,M} + \gamma_2 \epsilon_{t-1,X} + \epsilon_{t,Y})
+Y_t &= \eta_0(\eta_0 Y_{t-2} + \eta_1 M_{t-2} + \eta_2 X_{t-2} + \epsilon_{t-1,Y}) + \eta_1(\beta_0 M_{t-2} +\beta_1 X_{t-2} +\epsilon_{t-1,M}) + \eta_2 (\alpha X_{t-2} + \epsilon_{t-1,X}) + \epsilon_{t,Y} \\
+&= \eta_0^2 Y_{t-2} + (\eta_0 + \beta_0) \eta_1 M_{t-2} + (\eta_0 \eta_2 + \eta_1 \beta_1 + \eta_2 \alpha)X_{t-2} + (\eta_0 \epsilon_{t-1,Y} + \eta_1 \epsilon_{t-1,M} + \eta_2 \epsilon_{t-1,X} + \epsilon_{t,Y})
 \end{align}
 $$
 
-From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$. The direct effect of $X_{t-2}$ on $Y_t$ is $\gamma_0 \gamma_2 + \gamma_2 \alpha$, and the indirect effect of $X_{t-2}$ on $Y_t$ is $\gamma_1 \beta_1$.
+From which we note that there are implicit $X_{t-3}$'s in $Y_{t-2}$ and $M_{t-2}$. Although this does allow us to make a statement about how $Y_{t}$ is related to $X_{t-2}$. The direct effect of $X_{t-2}$ on $Y_t$ is $\eta_0 \eta_2 + \eta_2 \alpha$, and the indirect effect of $X_{t-2}$ on $Y_t$ is $\eta_1 \beta_1$.
 
 A natural question at this point is why not use $X_{t-3}$ since $X_{t-2}$, $M_{t-2}$, and $Y_{t-2}$ depend on $X_{t-3}$? There is no need to go this far back since it will not involve any new paths to get to $Y_t$, all of the inputs to $Y_t$ are captured when we consider $X_{t-2}$, and so we do not need to go back further. We also note that if we only look at the impact of $X_{t-1}$ on $Y_t$, then we will be missing the impact of $M_{t-1}$ and $Y_{t-1}$ since neither of them depend on $X_{t-1}$ and would not be captured if we were only examining the impact of $X_{t-1}$ on $Y_t$.
 
 ## Relationships
 
-We note that there is no completely direct effect from $X_{t-2}$ to $Y_t$, in the sense of an immediate connection between the variables. The previous labelled direct effect is the effect of $X_{t-2}$ on $Y_t$ if $M_t$ is not present, and the indirect effect is the effect of $X_{t-2}$ on $Y_t$ when mediated through $M_{t-1}$. However both of the paths that the direct effect takes are themselves mediated through $X$ and $Y$. We consider the first option, $X_{t-2}$ mediated through itself $X_{t-1}$ to be the self-mediated direct effect, this is given by $\gamma_2 \alpha$. There is also the second option of $X_{t-2}$ mediated through $Y_{t-1}$ which is the cross-mediated direct effect and is given by $\gamma_0 \gamma_2$.
+We note that there is no completely direct effect from $X_{t-2}$ to $Y_t$, in the sense of an immediate connection between the variables. The previous labelled direct effect is the effect of $X_{t-2}$ on $Y_t$ if $M_t$ is not present, and the indirect effect is the effect of $X_{t-2}$ on $Y_t$ when mediated through $M_{t-1}$. However both of the paths that the direct effect takes are themselves mediated through $X$ and $Y$. We consider the first option, $X_{t-2}$ mediated through itself $X_{t-1}$ to be the self-mediated direct effect, this is given by $\eta_2 \alpha$. There is also the second option of $X_{t-2}$ mediated through $Y_{t-1}$ which is the cross-mediated direct effect and is given by $\eta_0 \eta_2$.
 
 We can summarize the total effect of $X_{t-2}$ on $Y_t$ in the following chart:
 
-| Total Effect | $\gamma_2 \alpha + \gamma_0 \gamma_2 + \gamma_1 \beta_1$ |
+| Total Effect | $\eta_2 \alpha + \eta_0 \eta_2 + \eta_1 \beta_1$ |
 |------------------------------------|------------------------------------|
-| self-mediated direct effect | $\gamma_2 \alpha$ |
-| cross-mediated direct effect | $\gamma_0 \gamma_2$ |
-| Indirect effect/mediated effect | $\gamma_1 \beta_1$ |
+| self-mediated direct effect | $\eta_2 \alpha$ |
+| cross-mediated direct effect | $\eta_0 \eta_2$ |
+| Indirect effect/mediated effect | $\eta_1 \beta_1$ |
 
 ## Further exploration of ARX(p) models
 
