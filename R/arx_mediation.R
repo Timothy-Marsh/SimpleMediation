@@ -36,16 +36,19 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1)){
   CovXM <- cov(X[-1],M)
   CovXM_theory <- var(X) * ((beta[3]^2)/((1-alpha[1]^2)*(1-beta[3]^2)))
   diffXM <- abs(CovXM - CovXM_theory)
+  diffXMpercent <- (diffXM/CovXM)*100
   
   CovXY <- cov(X[-c(1,2)], Y)
   CovXY_theory <- var(X) * ((eta[4]^2)/((1-alpha[1]^2)*(1-eta[4]^2)))
   diffXY <- abs(CovXY- CovXY_theory)
+  diffXYpercent <- (diffXY/CovXY)*100
   
   CovMY <- cov(M[-1], Y)
   CovMY_theory <- var(X) * ((eta[4]^2 * beta[3]^2)/((1-beta[3]^2)*(1-eta[4]^2))) + var(M) * ((eta[3]^2)/((1-beta[3]^2)*(1-eta[3]^2)))
   diffMY <- abs(CovMY - CovMY_theory)
+  diffMYpercent <- (diffMY/CovMY)*100
   
-  list(XM = c(CovXM, CovXM_theory[[1]], diffXM[[1]]), XY = c(CovXY, CovXY_theory[[1]], diffXY[[1]]), MY = c(CovMY, CovMY_theory[[1]],diffMY[[1]]))
+  list(XM = c(CovXM, CovXM_theory[[1]], diffXM[[1]],diffXMpercent), XY = c(CovXY, CovXY_theory[[1]], diffXY[[1]],diffXYpercent), MY = c(CovMY, CovMY_theory[[1]],diffMY[[1]],diffMYpercent))
 }
 
 # testing :P
@@ -59,9 +62,9 @@ yp <- 1
 
 # A function that simulates mutliple iterations of the previous function
 arx_mediation_summary <- function(iterations = 1000){
-  resultsXM <- data.frame(observed = NA, theoretical = NA, difference = NA)
-  resultsXY <- data.frame(observed = NA, theoretical = NA, difference = NA)
-  resultsMY <- data.frame(observed = NA, theoretical = NA, difference = NA)
+  resultsXM <- data.frame(observed = NA, theoretical = NA, difference = NA, percentDiff =  NA)
+  resultsXY <- data.frame(observed = NA, theoretical = NA, difference = NA, percentDiff =  NA)
+  resultsMY <- data.frame(observed = NA, theoretical = NA, difference = NA, percentDiff =  NA)
   
   for (i in 1:iterations) {
     #n <- runif(1, min = 1000, max = 1000)
