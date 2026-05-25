@@ -1,0 +1,42 @@
+---
+title: "abstract"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{abstract}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimpleMediation)
+```
+
+# Old abstract (for proposal)
+
+Non-linearity in mediation analysis has been primarily studied in the context of binary variables which encode a treatment and control, estimating a `direct` and `indirect` effect of a covariate (a.k.a. treatment) $X$ on a response $Y$, with a third variable $M$ (the `mediator`) that is affected by $X$ and in turn affects $Y$. The focus of mediation analysis in general is to quantify the overall effect of $X$ on $Y$, including the effect through $M$. This thesis will focus on one or more continuous treatments and apply non-linear methods, including splines and machine learning models, to the structure of mediation analysis.
+
+This thesis focuses on using time series data in a mediation context. This presents unique challenges since $X$ affects $M$ and $Y$, which in turn depend on the previous observations of $X$, $M$, and possibly $Y$, depending on the structure of the particular time series model chosen. The form of non-linearity in these effects must be chosen carefully to capture the relationships present in the data while still providing interpretable results.
+
+Using Splines, the additive basis structure that comes from the basis splines results in a mediation model with as many mediators as there are basis functions. The result is that the mediator and response variable can both be represented as splines, which have the nice property of being differentiable, allowing us to use a derivative definition of the indirect and direct effect for their estimation. For machine learning methods, we can either work with black box models that produce predictions which must be incorporated in the equations, or we can use explainable machine learning methods that produce a smooth function along with a derivative-based definition of direct and indirect effects.
+
+This study will then apply these methods to an economic context by detecting non-linear mediation effects, specifically the indirect effect on the results of using macroeconomic factors as the variables $X$, $Y$, and $M$. The particular factors of interest are measures of productivity and economic indicators that can inform our understanding of how the economy moves. These indicators are measured in such a way as to be variables occurring over time, indicating that time-series methods will be necessary. In addition, there is a large degree of non-linearity in both how many of these measures change over time, but also in how they relate to each other. The result is that it is necessary to use methods that are capable of handling non-linear time-series data.
+
+# Updated version building on the old one but with new additions 
+Note, the first paragraph, splines, and ML sections are the same. The final three paragraphs (talking about splines, arx, and ML) are inteded to be combined into one, but are left separately here for clarity.
+
+Non-linearity in mediation analysis has been primarily studied in the context of binary variables which encode a treatment and control, estimating a `direct` and `indirect` effect of a covariate (a.k.a. treatment) $X$ on a response $Y$, with a third variable $M$ (the `mediator`) that is affected by $X$ and in turn affects $Y$. The focus of mediation analysis in general is to quantify the overall effect of $X$ on $Y$, including the effect through $M$. This thesis will focus on one or more continuous treatments and apply non-linear methods, including splines and machine learning models, to the structure of mediation analysis.
+
+This thesis focuses on using time series data in a mediation context. This presents unique challenges since $X$ affects $M$ and $Y$, which in turn depend on the previous observations of $X$, $M$, and $Y$. This thesis examines the theoretical effects of using time series models to model each of $X$, $M$, and $Y$, with two main goals; improving the interpretability of the models, and improving their performance. The methodology to test this is to use code to examine if the observed results match up with what we would expect given the theoretical results. Once the validity of the results is confirmed the mediation results are compared with several other models to determine their relative performance.
+
+The first part is using splines the additive basis structure that comes from the basis splines results in a mediation model with as many mediators as there are basis functions. The result is that the mediator and response variable can both be represented as splines, which have the nice property of being differentiable, allowing us to use a derivative definition of the indirect and direct effect for their estimation. 
+
+The next section is on modelling the mediation relationships with ARX models and exploring the possibilities of using dedicated time series methods in a mediation context. The structure if to model $X$ as an AR($p$) model, and $M$, and $Y$ as ARX models, and find the associated covariances and autocovariances to be able to make accurate predictions.
+
+This thesis then explores machine learning methods, we can either work with black box models that produce predictions which must be incorporated in the equations, or we can use explainable machine learning methods that produce a smooth function along with a derivative-based definition of direct and indirect effects.
