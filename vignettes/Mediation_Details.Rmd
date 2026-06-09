@@ -120,7 +120,7 @@ Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
 &= Var( \epsilon_{t,M} + \beta_0 \epsilon_{t-1,M} + \beta_0^2 \epsilon_{t-2,M} + \cdots +
 \beta_1 ( X_{t-1} + \beta_0 X_{t-2} + \cdots ) ) \\
 &= \sigma^2_M (1 + \beta_0 + \beta_0^2+ \cdots) + \frac{\sigma^2_X \beta_1}{1-\alpha^2} (1 + \beta_0 + \beta_0^2 + \cdots)  \\
-&= \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \frac{\sigma^2_X \beta_1}{1-\alpha^2} \left( \frac{1}{1-\beta_1^2} \right)
+&= \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \frac{\sigma^2_X \beta_1}{1-\alpha^2} \left( \frac{1}{1-\beta_0^2} \right)
 \end{align}
 $$
 
@@ -128,12 +128,12 @@ OR
 
 $$
 \begin{align}
-Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1}) \\
-&= Var(\beta_0 M_{t-1}) + Var(\beta_1 X_{t-1}) +2 Cov(X_{t-1}, M_{t-1}) \\
-&= \beta_0^2Var(M_{t-1}) + \beta^2_1 Var(X_{t-1}) + 2 Cov(X_{t-1}, M_{t-1}) \\
-Var(M_t) - \beta_0^2 Var(M_{t-1}) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) \\
-(1-\beta_0^2) Var(M_t) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) \\
-Var(M_t) &= \frac{\beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1})}{(1-\beta_0^2)}
+Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
+&= Var(\beta_0 M_{t-1}) + Var(\beta_1 X_{t-1}) +2 Cov(X_{t-1}, M_{t-1}) + \sigma^2_M \\
+&= \beta_0^2Var(M_{t-1}) + \beta^2_1 Var(X_{t-1}) + 2 Cov(X_{t-1}, M_{t-1}) + \sigma^2_M \\
+Var(M_t) - \beta_0^2 Var(M_{t-1}) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M \\
+(1-\beta_0^2) Var(M_t) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M \\
+Var(M_t) &= \frac{\beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M}{(1-\beta_0^2)}
 \end{align}
 $$
 
