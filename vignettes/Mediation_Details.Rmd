@@ -77,7 +77,7 @@ $$
 
 It is reasonable for us to assume that each of these process is stationary. While many time series are not actually stationary, there are a wide variety of techniques that transform a non-stationary time series into a stationary one, it is reasonable for us to assume that when using this process the starting time series can be turned into stationary ones.
 
-We also define the errors from these models to be:
+We also define $\epsilon$ from these models to be white noise with the following distribution:
 
 $$
 \epsilon_{t,X} \sim N(0,\sigma^2_X)\\
@@ -85,63 +85,158 @@ $$
 \epsilon_{t,Y} \sim N(0,\sigma^2_Y)
 $$
 
-Here we are also assuming that the errors are uncorrelated with each other.
+Here we are also assuming that the errors are uncorrelated with each other, since they follow a white noise pattern. We also note that this implies $\epsilon_{t,X}$ is uncorrelated with $\epsilon_{t-1,X}$
 
 ### Initial Values
 
-For an AR(1) model the initial point $X_0$ follows a distribution with mean 0, and variance $\sigma^2/(1-\phi^2)$. In the mediation context we will need initial values for $X$, $M$, and $Y$.
+For an AR(1) model the initial point $X_0$ follows a distribution with mean 0, and variance $\sigma^2/(1-\alpha^2)$. In the mediation context we will need initial values for $X$, $M$, and $Y$.
 
 Since $X$ is an AR(1) model, we define the initial value to be:
 
 $$
-X_0\sim N \left( 0,\frac{\sigma^2_X}{(1-\phi^2)} \right)
+X_0\sim N \left( 0,\frac{\sigma^2_X}{(1-\alpha^2)} \right)
 $$
 
 We also need an initial value for $M$, which is an ARX(1) process. The mean of the initial value is still 0, but the variance is now also dependent on $X$.
 
-### Options for Var(M)
+#### Variance of M
+
+The variance of M can be calculated using the properties of variance as:
 
 $$
 \begin{align}
-Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
-&= Var( \epsilon_{t,M} + \beta_0 \epsilon_{t-1,M} + \beta_0^2 \epsilon_{t-2,M} + \cdots +
-\beta_1 \epsilon_{t-1,X} + \beta_1^2 \epsilon_{t-2,X} + \cdots ) \\
-&= \sigma^2_M (1 + \beta_0 + \beta_0^2+ \cdots) + \sigma^2_X (\beta_1 + \beta_1^2 + \cdots) \\
-&= \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right)
+Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1X_{t-1} + \epsilon_{t,M}) \\
+&= \beta_0^2 Var(M_{t-1}) + \beta_1^2 Var(X_{t-1}) + Var(\epsilon_{t,M}) + 2Cov(M_{t-1},X_{t-1}) + 2Cov(M_{t-1},\epsilon_{t,M}) + 2Cov(X_{t-1},\epsilon_{t,M})
 \end{align}
 $$
 
-OR
+We now examine the covariances, and our assumptions of the models and their errors allow us to set some of them to 0.
+
+-   $Cov(M_{t-1}, X_{t-1}) = 0$ since $M_{t-1}$ depends on $X_{t-2}$ and further back $X$'s, but not $X_{t-1}$, so this covariance is zero.
+-   $Cov(M_{t-1},\epsilon_{t,M}) = 0$, since $M_{t-1}$ is a function of $\epsilon_{t-j,M}$ for $j \in [1,t]$, and from our assumptions $Cov(\epsilon_{t,M},\epsilon_{t-i,M}) = 0$ for $i \neq 0$.
+-   $Cov(X_{t-1}, \epsilon_{t,M}) = 0$ Since $X_{t-1}$ only depends on $\epsilon_{t-i,X}$ for $i \in [1,t]$, that is we get a string of covariances between $\epsilon_{t,M}$ and $\epsilon_{t-i,X}$ which all have covariance 0 from our assumptions in setting up the system.
+
+Using these results we continue the calculation of the variance of $M_t$:
 
 $$
 \begin{align}
-Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
-&= Var(\epsilon_{t,M} + \beta_0 (\beta_0 M_{t-2} + \beta_1 X_{t-2} + \epsilon_{t-1,M}) + \beta_1 X_{t-1}) \\
-&= Var( \epsilon_{t,M} + \beta_0 \epsilon_{t-1,M} + \beta_0^2 \epsilon_{t-2,M} + \cdots +
-\beta_1 ( X_{t-1} + \beta_0 X_{t-2} + \cdots ) ) \\
-&= \sigma^2_M (1 + \beta_0 + \beta_0^2+ \cdots) + \frac{\sigma^2_X \beta_1}{1-\alpha^2} (1 + \beta_0 + \beta_0^2 + \cdots)  \\
-&= \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \frac{\sigma^2_X \beta_1}{1-\alpha^2} \left( \frac{1}{1-\beta_0^2} \right)
+Var(M_t) &= \beta_0^2 Var(M_{t-1}) + \beta_1^2 Var(X_{t-1}) + Var(\epsilon_{t,M}) + 2Cov(M_{t-1},X_{t-1}) + 2Cov(M_{t-1},\epsilon_{t,M}) + 2Cov(X_{t-1},\epsilon_{t,M}) \\
+Var(M_t) &= \beta_0^2 Var(M_{t-1}) + \beta_1^2 Var(X_{t-1}) + Var(\epsilon_{t,M}) + 0 + 0 + 0 \\
 \end{align}
 $$
 
-OR
+We use the variance of $X_{t-1}$ we calculated earlier, and make the assumption of constant variance: $Var(M_{t-i}) = Var(M_{t-j})$, for $i \neq j$. We have also previously defined $Var(\epsilon_{t,M}) = \sigma^2_M$.
 
 $$
 \begin{align}
-Var(M_t) &= Var(\beta_0 M_{t-1} + \beta_1 X_{t-1} + \epsilon_{t,M}) \\
-&= Var(\beta_0 M_{t-1}) + Var(\beta_1 X_{t-1}) +2 Cov(X_{t-1}, M_{t-1}) + \sigma^2_M \\
-&= \beta_0^2Var(M_{t-1}) + \beta^2_1 Var(X_{t-1}) + 2 Cov(X_{t-1}, M_{t-1}) + \sigma^2_M \\
-Var(M_t) - \beta_0^2 Var(M_{t-1}) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M \\
-(1-\beta_0^2) Var(M_t) &= \beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M \\
-Var(M_t) &= \frac{\beta_1^2 \frac{1}{(1-\alpha^2)} \sigma^2_X + 2Cov(X_{t-1},M_{t-1}) + \sigma^2_M}{(1-\beta_0^2)}
+Var(M_t) - \beta_0^2 Var(M_{t-1}) &= \beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M \\
+Var(M_t)(1-\beta_0^2) &= \beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M \\
+Var(M_t) &= \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)}
 \end{align}
 $$
 
-So we get an initial value for $M$ of $M_0 \sim N \left( 0, \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right)$.
+So we get an initial value for $M$ of $M_0 \sim N \left( 0, \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} \right)$.
 
-Following a similar argument we get an initial value for $Y$ of $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$.
+#### Variance of Y
 
-We note that the values of $Y$ are dependent on two previous values of $X$, and so we also need an initial value for $Y_1$. If we say that the initial value of $Y_0$ is $Y_0 \sim N \left( 0 , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$. Then the value of $Y_1$ is $Y_1 \sim N \left( \eta_0 Var(Y_0) + \eta_1 Var(M_0) +\eta_2 Var(X_0), \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)$
+Following a similar argument we get an initial value for $Y$:
+
+$$
+\begin{align}
+Var(Y_t) &= Var(\eta_0Y_{t-1} + \eta_1 M_{t-1} + \eta_2 X_{t-1} + \epsilon_{t,Y}) \\
+&= \eta_0^2Var(Y_{t-1}) + \eta_1^2 Var(M_{t-1}) + \eta_2^2 Var(X_{t-1}) \\
+&+ 2Cov(Y_{t-1}, M_{t-1}) + 2Cov(Y_{t-1},X_{t-1}) + 2Cov(Y_{t-1},\epsilon_{t,Y}) \\
+&+ 2Cov(M_{t-1}, X_{t-1}) + 2Cov(M_{t-1}, \epsilon_{t,Y}) + 2Cov(X_{t-1}, \epsilon_{t,Y})
+\end{align}
+$$
+
+Following a similar argument from the variance of $M$, we get the covariances here to be zero:
+
+$$
+\begin{align}
+Var(Y_t) &= \eta_0^2Var(Y_{t-1}) + \eta_1^2 Var(M_{t-1}) + \eta_2^2 Var(X_{t-1}) + Var(\epsilon_{t,Y}) 0\\
+Var(Y_t) - \eta_0^2Var(Y_{t-1}) &= \eta_1^2 \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} + \eta_2^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_Y\\
+Var(Y_t)(1-\eta_0^2) &= \eta_1^2 \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} + \eta_2^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_Y\\
+Var(Y_t) &= \frac{\eta_1^2 \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} + \eta_2^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_Y}{(1-\eta_0^2)} \\
+Var(Y_t) &= \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)} \\
+&= \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)}
+\end{align}
+$$
+
+From which we get an initial value for $Y$ of $Y_0 \sim N \left( 0 , \left( \eta_1^2 \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} + \eta_2^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_Y \right) /(1-\eta_0^2) \right)$.
+
+We note that the values of $Y$ are dependent on two previous values of $X$, and so we also need an initial value for $Y_1$. Given the initial value for $Y$ above, then the value of $Y_1$ is $Y_1 \sim N \left( \eta_0 Var(Y_0) + \eta_1 Var(M_0) +\eta_2 Var(X_0), \left( \eta_1^2 \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} + \eta_2^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_Y \right) /(1-\eta_0^2) \right)$
+
+### Covariances between X, M, and Y
+
+It is a reasonable assumption to make that the covariance between the variables remains constant. We also assume that $Cov(\sigma_X^2,\sigma^2_M) = 0$, $Cov(\sigma_X^2,\sigma^2_Y) = 0$, and $Cov(\sigma_M^2,\sigma^2_Y) = 0$, while $Cov(\sigma_X^2,\sigma^2_X) = Var(\sigma^2_X) = \epsilon ?$ We also note that the covariance that we are interested in is
+
+#### Cov(X,M)
+
+For the covariance between $X$ and $M$, we get:
+
+$$
+\begin{align}
+Cov(X,M) &= Cov(X_0,M_0) \\
+&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} \right) \\
+&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X}{(1-\beta_0^2)} \right) \\
+&= \frac{\beta_1^2}{(1-\alpha^2)^2(1-\beta_0^2)} \sigma^2_X
+\end{align}
+$$
+
+#### Cov(X,Y)
+
+Assuming constant covariances then we also find the covariances $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$ to be:
+
+$$
+\begin{align}
+Cov(X,Y) &= Cov \left(\left( \frac{1}{1-\alpha^2} \right)  \sigma^2_X  , \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)} \right) \\
+&= \left( \frac{1}{1-\alpha^2} \right) \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) Cov(\sigma^2_X) \\
+&= \left( \frac{1}{1-\alpha^2} \right) \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X
+\end{align}
+$$
+
+#### Cov(M,Y)
+
+Following similar methods we find the covariance between $M$ and $Y$.
+
+$$
+\begin{align}
+Cov(M,Y) &= Cov \left( \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X}{(1-\beta_0^2)} + \frac{\sigma^2_M}{(1-\beta_0^2)(1-\eta_0^2)} , \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)} \right) \\
+&= Cov \left(  \frac{1}{(1-\beta_0^2)}\sigma^2_M, \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M \right) + Cov \left( \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) }{(1-\beta_0^2)} \sigma^2_X, \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X \right)\\
+&= \frac{1}{(1-\beta_0^2)} \cdot \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} Cov(\sigma^2_M, \sigma^2_M) + \frac{\beta_1^2 }{(1-\beta_0^2)(1-\alpha^2)} \cdot \left( \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right)\right) Cov(\sigma^2_X,\sigma^2_X) \\
+&= \frac{\eta_1^2}{\left( 1-\beta_0^2 \right)^2(1-\eta_0^2)} \sigma^2_M + \left(  \frac{\beta_1^4 \eta_1^2 + \beta_1^2\eta_2^2(1-\beta_0^2)}{\left(1-\alpha^2\right)^2 \left(1-\beta_0^2\right)^2 (1-\eta_0^2)}  \right) \sigma^2_X
+\end{align}
+$$
+
+#### Estimation of Covariances
+
+We note that these covariances rely on the values: $\sigma^2_X$, $\sigma^2_M$, and $\sigma^2_Y$. However we can estimate these values if we know the variance of the variables:
+
+$$
+\begin{align}
+Var(X) &= \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X \\
+\implies\sigma^2_X &= Var(X) (1-\alpha^2)
+\end{align}
+$$
+
+Similarly for $\sigma^2_M$:
+
+$$
+\begin{align}
+Var(M) &= \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)} \\
+\implies \sigma^2_M &= Var(M)(1-\beta_0^2) - \beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X
+\end{align}
+$$
+
+And:
+
+$$
+\begin{align}
+Var(Y) &= \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)} \\
+\implies \sigma^2_Y &= \left( Var(Y) - \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M \right) (1-\eta_0^2)
+\end{align}
+$$
 
 ### Autocovariances
 
@@ -150,13 +245,15 @@ We note that the values of $Y$ are dependent on two previous values of $X$, and 
 We note that $X_t$ follows that AR(1) process and so it has the autocovariance $\gamma_x(h)$:
 
 $$
-\gamma_x(h) = \sigma^2_X \frac{\phi^{|h|}}{(1-\phi^2)}
+\gamma_x(h) = \sigma^2_X \frac{\alpha^{|h|}}{(1-\alpha^2)}
 $$
 
 #### ACF of M
 
-Now looking for the autocovariance of $M_t$ we start with $\gamma_m(0)$ which is the variance of $M_t$ $$
-\gamma_m(0) = \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right)
+Now looking for the autocovariance of $M_t$ we start with $\gamma_m(0)$ which is the variance of $M_t$
+
+$$
+\gamma_m(0) = \frac{\beta_1^2 \left( \frac{1}{1-\alpha^2} \right) \sigma^2_X + \sigma^2_M}{(1-\beta_0^2)}
 $$
 
 Then $\gamma_m(1)$ is:
@@ -196,23 +293,22 @@ $$
 \end{align}
 $$
 
-If we assume that the covariance is constant, this becomes:
+This becomes:
 
 $$
 \begin{align}
-\gamma_m(h) &= \beta_0^h \gamma_m(0) + \beta_1 Cov(X_{t}, M_{t}) \sum^h_{i=0} \alpha^i\\
-&= \beta_0^h \gamma_m(0) + \beta_1 Cov(X_{t}, M_{t}) \cdot \frac{1}{1-\alpha}
+\gamma_m(h) &= \beta_0^h \gamma_m(0) + \beta_1 \left( \sum^h_{i=0} \alpha^i \right) Cov(X, M) \\
+&= \beta_0^h \gamma_m(0) + \beta_1  \frac{1}{1-\alpha} \frac{\beta_1^2}{(1-\alpha^2)^2(1-\beta_0^2)} \sigma^2_X \\
+&= \beta_0^h \gamma_m(0) \frac{\beta_1^3 \sigma^2_X}{(1-\alpha^2)^3(1-\beta_0^2)}
 \end{align}
 $$
-
-This relies on knowing the covariance between $X_t$ and $M_t$.
 
 #### ACF of Y
 
 Using a similar approach to the one for the autocovariance of $M_t$ we start with $\gamma_y(0)$:
 
 $$
-\gamma_y(0) = \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right)
+\gamma_y(0) =  \left( \frac{\eta^2_1\beta_1^2 + \eta_2^2(1-\beta_0^2)}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)}  \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)}
 $$
 
 We also find $\gamma_y(1)$:
@@ -255,56 +351,7 @@ From this we can get the generalization:
 $$
 \begin{align}
 \gamma_y(h) &= \eta_0\gamma_y(h-1) + \eta_1\beta_0^hCov(M_{t-h},Y_{t-h}) + \left( [\beta_0^{h-2} + \beta_0^{h-3}\alpha + \cdots + \beta_0\alpha^{h-3} + \alpha^{h-2}] + \eta_2 \alpha^{h-1} \right) Cov(X_{t-h}, Y_{t-h}) \\
-\gamma_y(h) &= \eta_0\gamma_y(h-1) + \eta_1\beta_0^hCov(M_{t-h},Y_{t-h}) + \left( \frac{\beta_0^{h-1}-\alpha^{h-1}}{\beta_0 - \alpha} + \eta_2 \alpha^{h-1} \right) Cov(X_{t-h}, Y_{t-h})
-\end{align}
-$$
-
-### Covariances between X, M, and Y
-
-We note that these values all directly rely on $Cov(X_t,M_t)$, $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$.
-
-There are two possibilities here. If we assume that all the covariances are the same then:
-
-$$
-\begin{align}
-Cov(X_t,M_t) &= Cov(X_0,M_0) \\
-&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right) \\
-&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) \right) \\
-&= \frac{\beta_1^2}{(1-\alpha^2)(1-\beta_1^2)} \sigma^2_X
-\end{align}
-$$
-
-Since $Cov(\sigma^2_X,\sigma^2_M)=0$.
-
-If the assumption of constant covariances does not hold then we have the following:
-
-$$
-\begin{align}
-Cov(X_t,M_t) &= \alpha^t Cov(X_0,M_t) \\
-&= \alpha^t (\beta_0Cov(X_0,M_{t-1}) + \beta_1 Cov(X_0,X_{t-1})) \\
-&= \alpha^t\beta_0 Cov(X_0,M_0) + \beta_1 \sum_{i=1}^{t-1} \beta_0^i\gamma_x(t-i) \\
-&= \alpha^t\beta_0 \left( \frac{\beta_1^2}{(1-\alpha^2)(1-\beta_1^2)} \sigma^2_X \right) + \beta_1 \sum_{i=1}^{t-1} \beta_0^i\gamma_x(t-i)
-\end{align}
-$$
-
-Assuming constant covariances then we also find the covariances $Cov(X_t,Y_t)$, and $Cov(M_t,Y_t)$ to be:
-
-$$
-\begin{align}
-Cov(X_t,Y_t) &= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right), \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
-&= Cov \left( \sigma^2_X \left( \frac{1}{1-\alpha^2} \right),  \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
-&= \frac{\eta_2^2}{(1-\alpha^2)(1-\eta_2^2)} \sigma^2_X
-\end{align}
-$$
-
-and:
-
-$$
-\begin{align}
-Cov(M_t,Y_t) &= Cov \left( \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right) + \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right) , \sigma^2_Y \left( \frac{1}{1-\eta_0^2} \right) + \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) + \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right) \\
-&= Cov \left(  \sigma^2_M \left( \frac{1}{1-\beta_0^2} \right), \sigma^2_M \left( \frac{\eta_1^2}{1-\eta_1^2} \right) \right) + Cov \left( \sigma^2_X \left( \frac{\beta_1^2}{1-\beta_1^2} \right), \sigma^2_X \left( \frac{\eta_2^2}{1-\eta_2^2} \right) \right)\\
-&= \left( \frac{\eta_1^2}{(1-\beta^2_0)(1-\eta_1^2)} \right) Cov(\sigma^2_M, \sigma^2_M) + \left( \frac{\beta_1^2\eta_2^2}{(1-\beta_1^2)(1-\eta^2_2)} \right) Cov(\sigma^2_X,\sigma^2_X) \\
-&= \left( \frac{\eta_1^2}{(1-\beta^2_0)(1-\eta_1^2)} \right) \sigma^2_M + \left( \frac{\beta_1^2\eta_2^2}{(1-\beta_1^2)(1-\eta^2_2)} \right) \sigma^2_X
+\gamma_y(h) &= \eta_0\gamma_y(h-1) + \eta_1\beta_0^hCov(M,Y) + \left( \frac{\beta_0^{h-1}-\alpha^{h-1}}{\beta_0 - \alpha} + \eta_2 \alpha^{h-1} \right) Cov(X, Y)
 \end{align}
 $$
 
