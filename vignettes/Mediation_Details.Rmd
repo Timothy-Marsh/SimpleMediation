@@ -18,44 +18,7 @@ knitr::opts_chunk$set(
 library(SimpleMediation)
 ```
 
-This package is code for my thesis on mediation in a time series context. This vignette details the theory behind mediation and the functions that I am writing for the thesis. This vignette will help link the theory with the specific functions that I am writing.
-
-# Basic mediation functions
-
-The functions `run_mediation`, and `simple_mediation` are both for normal mediation on continuous variables. `run_mediation` runs a simple mediation on three variables, and `simple_mediation` uses it to perform bootstrapping in a simple mediation context and gives an estimate for the variance and covariance of the mediation.
-
 # Mediation for ARX models
-
-We denote an ARX(1) model as:
-
-$$
-X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t
-$$
-
-Where: $\epsilon_t \sim N(0,\sigma^2)$
-
-We can examine the autocovariance of an ARX(1) model. If we use the above definition the ARX(1) model is: $X_t = \phi X_{t-1} + \psi Z_{t-1} + \epsilon_t$, and suppose that $X_0 \sim WN(0, \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}))$ and we find the autocovariance:
-
-$$
-\begin{align}
-\gamma (0) &= \sigma^2_X(\frac{1}{1-\phi})+\sigma^2_Z(\frac{\psi^2}{1-\psi^2}) \\
-\gamma(1) &= Cov(X_{t+1},X_t) \\
-&= Cov(\phi X_t + \psi Z_t + \epsilon_t, X_t) \\
-&= \phi Cov(X_t, X_t) + \psi Cov(Z_t,X_t) + Cov(\epsilon_t, X_t) \\
-&= \phi \gamma(0) + \psi Cov(Z_t,X_t)
-\end{align}
-$$
-
-This calculation depends on the value of $Cov(Z_t,X_t)$:
-
-$$
-\begin{align}
-Cov(Z_t,X_t) &= Cov(Z_t, \phi X_{t-1} + \psi Z_{t-1} + \epsilon_{z,t}) \\
-&= \phi Cov(Z_t,X_{t-1}) + \psi Cov(Z_t,Z_{t-1}) + Cov(Z_t,\epsilon_{z,t}) \\
-&= \phi Cov(Z_t, X_{t-1}) + \psi\gamma_z(1) \\
-&= \phi(\phi Cov(Z_t,X_{t-2}) + \psi \gamma_z (2)) + \psi \gamma_z (1)
-\end{align}
-$$
 
 ## ARX in Mediation
 
@@ -384,6 +347,14 @@ We can summarize the total effect of $X_{t-2}$ on $Y_t$ in the following chart:
 
 ## Further exploration of ARX(p) models
 
-While ARX(1) models are a natural starting point, what is the effect of larger degrees of AR models?
+While ARX(1) models are a natural starting point, a next step is to determine what is the effect of a larger degrees of AR models?
 
 For notational clarity we define ARX($p,i$) models, $p$ is the degree of the AR component, and $i$ is the number of terms of the first exogenous process that are included, if there is a second process then I will be referring to it as ARX($p,i,j$) and so on.
+
+I will not be exploring much on this topic in this thesis, but it is an interesting area for future study.
+
+## Simulation of theoretical results
+
+## Conclusion of ARX Mediation
+
+The derivations in this section explain mediation for ARX(1) models, including their theoretical variances and covariances.
