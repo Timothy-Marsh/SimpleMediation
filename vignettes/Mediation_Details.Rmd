@@ -132,7 +132,7 @@ We note that the values of $Y$ are dependent on two previous values of $X$, and 
 
 ### Covariances between X, M, and Y
 
-It is a reasonable assumption to make that the covariance between the variables remains constant. We also assume that $Cov(\sigma_X^2,\sigma^2_M) = 0$, $Cov(\sigma_X^2,\sigma^2_Y) = 0$, and $Cov(\sigma_M^2,\sigma^2_Y) = 0$, while $Cov(\sigma_X^2,\sigma^2_X) = Var(\sigma^2_X) = \epsilon ?$ We also note that the covariance that we are interested in is
+It is a reasonable assumption to make that the covariance between the variables remains constant. We also assume that $Cov(\sigma_X^2,\sigma^2_M) = 0$, $Cov(\sigma_X^2,\sigma^2_Y) = 0$, and $Cov(\sigma_M^2,\sigma^2_Y) = 0$, while $Cov(\sigma_X^2,\sigma^2_X) = \sigma^2_X$ We also note that the covariance that we are interested in is
 
 #### Cov(X,M)
 
@@ -155,7 +155,8 @@ $$
 \begin{align}
 Cov(X,Y) &= Cov \left(\left( \frac{1}{1-\alpha^2} \right)  \sigma^2_X  , \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X + \frac{\eta_1^2}{(1-\beta_0^2)(1-\eta_0^2)} \sigma^2_M + \frac{\sigma^2_Y}{(1-\eta_0^2)} \right) \\
 &= \left( \frac{1}{1-\alpha^2} \right) \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) Cov(\sigma^2_X) \\
-&= \left( \frac{1}{1-\alpha^2} \right) \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X
+&= \left( \frac{1}{1-\alpha^2} \right) \left( \frac{\eta^2_1\beta_1^2}{(1-\alpha^2)(1-\beta_0^2)(1-\eta_0^2)} + \frac{\eta^2_2}{(1-\alpha^2)(1-\eta_0^2)} \right) \sigma^2_X \\
+&= \frac{\eta_1^2\beta_1^2 + (1-\beta_0^2)\eta_2^2}{\left( 1-\alpha^2 \right) ^2(1-\beta_0^2) \left(1-\eta_0^2\right)} \sigma^2_X
 \end{align}
 $$
 
