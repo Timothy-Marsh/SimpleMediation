@@ -27,28 +27,29 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1)){
   indirect <- eta[3] * beta[3]
   total <- selfMediated + crossMediated + indirect
   
-  # we now want to calculate their acf functions
-  # Xacf <- acf(Xt)
-  # Macf <- acf(Mt)
-  # Yacf <- acf(Yt)
+  # to estimate the covariances we will need the sigmas:
+  sigmaX <- var(X) * (1-alpha[1]^2)
   
   # comparing theoretical covariances to observed covariances
   # remove NA's
   CovXM <- cov(X[-1],M[-1])
   # find covariance according to our theory
-  CovXM_theory <- var(X) * ((beta[3]*alpha[1])/((1-alpha[1]^2)*(1-(beta[3]*alpha[1]) )))
+  #CovXM_theory <- var(X) * ((beta[3]*alpha[1])/((1-alpha[1]^2)*(1-(beta[3]*alpha[1]) )))
   #CovXM_theory <- var(X) * ((beta[3]^2)/((1-alpha[1]^2)*(1-(beta[3]^2) )))
   #CovXM_theory <- var(X) * ((beta[3]^3)/((1-alpha[1]^2)^2*(1-(beta[1]^2) )*(1-alpha[1]^2)*(1-beta[1]^2)))
+  CovXM_theory <- ((beta[3]^2)/((1-alpha[1]^2)^2 * (1-beta[1]^2)) ) * sigmaX
   diffXM <- abs(CovXM - CovXM_theory)
   diffXMpercent <- (diffXM/CovXM)*100
   
   CovXY <- cov(X[-c(1,2)], Y[-c(1,2)])
-  CovXY_theory <- var(X) * ((eta[4]^2)/((1-alpha[1]^2)*(1-eta[4]^2)))
+ # CovXY_theory <- var(X) * ((eta[4]^2)/((1-alpha[1]^2)*(1-eta[4]^2)))
+  CovXY_theory <- (1/(1-alpha[1]^2)) * ((beta[3]^2*eta[3]^2 + eta[4]^2 *(1-beta[1]^2))/((1-alpha[1]^2)*(1-beta[1]^2)*(1-eta[1]^2))) * sigmaX
   diffXY <- abs(CovXY- CovXY_theory)
   diffXYpercent <- (diffXY/CovXY)*100
   
   CovMY <- cov(M[-c(1,2)], Y[-c(1,2)])
-  CovMY_theory <- var(X) * ((eta[4]^2 * beta[3]^2)/((1-beta[3]^2)*(1-eta[4]^2))) + var(M[-1]) * ((eta[3]^2)/((1-beta[3]^2)*(1-eta[3]^2)))
+  #CovMY_theory <- var(X) * ((eta[4]^2 * beta[3]^2)/((1-beta[3]^2)*(1-eta[4]^2))) + var(M[-1]) * ((eta[3]^2)/((1-beta[3]^2)*(1-eta[3]^2)))
+  CovMY_theory <- 1
   diffMY <- abs(CovMY - CovMY_theory)
   diffMYpercent <- (diffMY/CovMY)*100
   
@@ -57,8 +58,11 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1)){
 
 # testing :P
 X <- arima.sim(list( ar = 0.5), 102)
-M <- arima.sim(list(ar = 0.6), 101) + 0.2 * X[-102]
-Y <- arima.sim(list(ar = 0.4), 100) + 0.3 * M[-101] + 0.5 * X[c(-101,-102)]
+m <- arima.sim(list(ar = 0.6), 101) + 0.2 * X[-102]
+
+y <- arima.sim(list(ar = 0.4), 100) + 0.3 * m[-101] + 0.5 * X[c(-101,-102)]
+M <- append(NA,m)
+Y <- append(c(NA,NA),y)
 
 xp <- 1
 mp <- 1
