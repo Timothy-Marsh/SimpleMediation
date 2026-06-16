@@ -113,9 +113,9 @@ arx_mediation_results <- function(results){
   hist((results[[2]]$observed - results[[2]]$theoretical)/results[[2]]$theoretical, main = "Cov(X,Y) errors diff percentage")
   hist((results[[3]]$observed - results[[3]]$theoretical)/results[[3]]$theoretical, main = "Cov(M,Y) errors diff percentage")
   
-  summary <- list(XM = list(observed = c(mean(XM$observed),sd(XM$observed),quantile(XM$observed, c(0.05,0.95))), plug_in = c(mean(XM$plug_in),sd(XM$plug_in)), theory = mean(XM$theoretical)),
-                  XY = list(observed = c(mean(XY$observed),sd(XY$observed),quantile(XY$observed, c(0.05,0.95))), plug_in = c(mean(XY$plug_in),sd(XY$plug_in)), theory = mean(XY$theoretical)),
-                  MY = list(observed = c(mean(MY$observed),sd(MY$observed),quantile(MY$observed, c(0.05,0.95))), plug_in = c(mean(MY$plug_in),sd(MY$plug_in)), theory = mean(MY$theoretical)))
+  summary <- list(XM = list(observed = c(mean(XM$observed),sd(XM$observed),quantile(XM$observed, c(0.025,0.9725))), plug_in = c(mean(XM$plug_in),sd(XM$plug_in)), theory = mean(XM$theoretical)),
+                  XY = list(observed = c(mean(XY$observed),sd(XY$observed),quantile(XY$observed, c(0.025,0.9725))), plug_in = c(mean(XY$plug_in),sd(XY$plug_in)), theory = mean(XY$theoretical)),
+                  MY = list(observed = c(mean(MY$observed),sd(MY$observed),quantile(MY$observed, c(0.025,0.9725))), plug_in = c(mean(MY$plug_in),sd(MY$plug_in)), theory = mean(MY$theoretical)))
   
   summary
 }
