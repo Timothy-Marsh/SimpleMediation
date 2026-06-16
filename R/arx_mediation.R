@@ -1,9 +1,13 @@
 # A function that runs mediation on ARX models and returns the covariance vs the expected theoretical covariance
-arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1)){
+arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1), theoreticals = list(XM_theory = 1,XY_theory=1,MY_theory=1)){
   n <- length(X)
   xp <- params$xp
   mp <- params$mp
   yp <- params$yp
+  
+  XM_theory <- theoreticals$XM_theory
+  XY_theory <- theoreticals$XY_theory
+  MY_theory <- theoreticals$MY_theory
   
   # create models
   Xt <- arima(X, order = c(xp,0,0))
@@ -41,9 +45,9 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1)){
   CovXY_plug <- ((beta[3]^2*eta[3]^2 + eta[4]^2 *(1-beta[1]^2))/((1-alpha[1]^2)^2*(1-beta[1]^2)*(1-eta[1]^2))) * sigmaX
   
   CovMY <- cov(M[-c(1,2)], Y[-c(1,2)])
-  CovMY_theory <- sigmaX * (eta[3]^2)/((1-beta[1]^2)^2 * (1-eta[1]^2)) + ((eta[3]^2 * beta[3]^4)+(eta[4]^2 * (1-beta[1]^2) * beta[3]^2))/((1-alpha^2)^2 * (1-beta[1]^2)^2 * (1-eta[1]^2))
+  CovMY_plug <- sigmaX * (eta[3]^2)/((1-beta[1]^2)^2 * (1-eta[1]^2)) + ((eta[3]^2 * beta[3]^4)+(eta[4]^2 * (1-beta[1]^2) * beta[3]^2))/((1-alpha^2)^2 * (1-beta[1]^2)^2 * (1-eta[1]^2))
   
-  list(XM = c(CovXM, CovXM_plug[[1]], XM_theory), XY = c(CovXY, CovXY_theory[[1]], XY_theory), MY = c(CovMY, CovMY_theory[[1]],MY_theory))
+  list(XM = c(CovXM, CovXM_plug[[1]], XM_theory), XY = c(CovXY, CovXY_plug[[1]], XY_theory), MY = c(CovMY, CovMY_plug[[1]],MY_theory))
 }
 
 # # testing :P
@@ -83,7 +87,7 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000){
     
     example_data <- head(data.frame(X,M,Y))
     
-    result <- arx_mediation(X,M,Y,params = list(xp = 1, mp = 1, yp = 1))
+    result <- arx_mediation(X,M,Y,params = list(xp = 1, mp = 1, yp = 1), theoreticals = list(XM_theory = XM_theory,XY_theory=XY_theory,MY_theory=MY_theory))
 
     resultsXM[i,] <- result$XM
     resultsXY[i,] <- result$XY
@@ -95,7 +99,20 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000){
 
 # Usage
 # first focusing on cov(X,M)
-results <- arx_mediation_summary(iterations = 1000, length = 1000)
-XM <- results[[1]]
-percent_diff <- (XM$observed - XM$theoretical)/XM$theoretical
-hist(percent_diff)
+#results <- arx_mediation_summary(iterations = 1000, length = 1000)
+arx_mediation_results <- function(results){
+  XM <- results[[1]]
+  XY <- results[[2]]
+  YM <- results[[3]]
+  
+  percent_diff <- (XM$observed - XM$theoretical)/XM$theoretical
+  hist(percent_diff)
+  
+  hist(results[[1]]$observed - results[[1]]$theoretical, main = "Cov(X,M) errors")
+  hist(results[[2]]$observed - results[[2]]$theoretical, main = "Cov(X,Y) errors")
+  hist(results[[3]]$observed - results[[3]]$theoretical, main = "Cov(M,Y) errors")
+  
+  hist((results[[1]]$observed - results[[1]]$theoretical)/results[[1]]$theoretical, main = "Cov(X,M) errors diff percentage")
+  hist((results[[2]]$observed - results[[2]]$theoretical)/results[[2]]$theoretical, main = "Cov(X,Y) errors diff percentage")
+  hist((results[[3]]$observed - results[[3]]$theoretical)/results[[3]]$theoretical, main = "Cov(M,Y) errors diff percentage")
+}
