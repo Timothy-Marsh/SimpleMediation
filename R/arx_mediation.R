@@ -97,22 +97,29 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000){
   list(XM = resultsXM, XY = resultsXY, MY = resultsMY, example_data)
 }
 
-# Usage
-# first focusing on cov(X,M)
-#results <- arx_mediation_summary(iterations = 1000, length = 1000)
 arx_mediation_results <- function(results){
   XM <- results[[1]]
   XY <- results[[2]]
-  YM <- results[[3]]
+  MY <- results[[3]]
   
   percent_diff <- (XM$observed - XM$theoretical)/XM$theoretical
   hist(percent_diff)
   
-  hist(results[[1]]$observed - results[[1]]$theoretical, main = "Cov(X,M) errors")
-  hist(results[[2]]$observed - results[[2]]$theoretical, main = "Cov(X,Y) errors")
-  hist(results[[3]]$observed - results[[3]]$theoretical, main = "Cov(M,Y) errors")
+  # hist(results[[1]]$observed - results[[1]]$theoretical, main = "Cov(X,M) errors")
+  # hist(results[[2]]$observed - results[[2]]$theoretical, main = "Cov(X,Y) errors")
+  # hist(results[[3]]$observed - results[[3]]$theoretical, main = "Cov(M,Y) errors")
   
   hist((results[[1]]$observed - results[[1]]$theoretical)/results[[1]]$theoretical, main = "Cov(X,M) errors diff percentage")
   hist((results[[2]]$observed - results[[2]]$theoretical)/results[[2]]$theoretical, main = "Cov(X,Y) errors diff percentage")
   hist((results[[3]]$observed - results[[3]]$theoretical)/results[[3]]$theoretical, main = "Cov(M,Y) errors diff percentage")
+  
+  summary <- list(XM = list(observed = c(mean(XM$observed),sd(XM$observed),quantile(XM$observed, c(0.05,0.95))), plug_in = c(mean(XM$plug_in),sd(XM$plug_in)), theory = mean(XM$theoretical)),
+                  XY = list(observed = c(mean(XY$observed),sd(XY$observed),quantile(XY$observed, c(0.05,0.95))), plug_in = c(mean(XY$plug_in),sd(XY$plug_in)), theory = mean(XY$theoretical)),
+                  MY = list(observed = c(mean(MY$observed),sd(MY$observed),quantile(MY$observed, c(0.05,0.95))), plug_in = c(mean(MY$plug_in),sd(MY$plug_in)), theory = mean(MY$theoretical)))
+  
+  summary
 }
+
+# Usage:
+#results <- arx_mediation_summary(iterations = 1000, length = 1000)
+#arx_mediation_results(results)
