@@ -47,7 +47,8 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1), theore
   CovMY <- cov(M[-c(1,2)], Y[-c(1,2)])
   CovMY_plug <- sigmaX * (eta[3]^2)/((1-beta[1]^2)^2 * (1-eta[1]^2)) + ((eta[3]^2 * beta[3]^4)+(eta[4]^2 * (1-beta[1]^2) * beta[3]^2))/((1-alpha^2)^2 * (1-beta[1]^2)^2 * (1-eta[1]^2))
   
-  list(XM = c(CovXM, CovXM_plug[[1]], XM_theory), XY = c(CovXY, CovXY_plug[[1]], XY_theory), MY = c(CovMY, CovMY_plug[[1]],MY_theory))
+  list(XM = c(CovXM, CovXM_plug[[1]], XM_theory), XY = c(CovXY, CovXY_plug[[1]], XY_theory), 
+       MY = c(CovMY, CovMY_plug[[1]],MY_theory), paramsX = c(alpha[[1]], alpha[[2]]), paramsM = c(beta[[1]], beta[[3]], beta[[2]]), paramsY = c(eta[[1]], eta[[3]], eta[[4]], eta[[2]]))
 }
 
 # # testing :P
@@ -63,14 +64,17 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1), theore
 # yp <- 1
 
 # A function that simulates mutliple iterations of the previous function
-arx_mediation_summary <- function(iterations = 1000, length = 1000){
+arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5, beta = c(0.2,0.8)){
   resultsXM <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   resultsXY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   resultsMY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
+  params_x <- data.frame(alpha = NA, intercept = NA)
+  params_m <- data.frame(beta0 = NA, beta1 = NA, intercept = NA)
+  params_y <- data.frame(eta0 = NA, eta1 = NA, eta2 = NA, intercept = NA)
   
   n <- length
-  alpha <- 0.5
-  beta <- c(0.2,0.3)
+  #alpha <- 0.5
+  #beta <- c(0.2,0.8)
   eta <- c(0.4,0.5,0.6)
   
   XM_theory <- (beta[2]^2)/((1-alpha^2)^2 * (1-beta[1]^2))
@@ -92,11 +96,15 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000){
     resultsXM[i,] <- result$XM
     resultsXY[i,] <- result$XY
     resultsMY[i,] <- result$MY
+    params_x[i,] <- result$paramsX
+    params_m[i,] <- result$paramsM
+    params_y[i,] <- result$paramsY
   }
   
-  list(XM = resultsXM, XY = resultsXY, MY = resultsMY, example_data)
+  list(XM = resultsXM, XY = resultsXY, MY = resultsMY, params_x = params_x, params_m = params_m, params_y = params_y, example_data)
 }
 
+# collate the results
 arx_mediation_results <- function(results){
   XM <- results[[1]]
   XY <- results[[2]]
@@ -105,13 +113,9 @@ arx_mediation_results <- function(results){
   percent_diff <- (XM$observed - XM$theoretical)/XM$theoretical
   hist(percent_diff)
   
-  # hist(results[[1]]$observed - results[[1]]$theoretical, main = "Cov(X,M) errors")
-  # hist(results[[2]]$observed - results[[2]]$theoretical, main = "Cov(X,Y) errors")
-  # hist(results[[3]]$observed - results[[3]]$theoretical, main = "Cov(M,Y) errors")
-  
-  hist((results[[1]]$observed - results[[1]]$theoretical)/results[[1]]$theoretical, main = "Cov(X,M) errors diff percentage")
-  hist((results[[2]]$observed - results[[2]]$theoretical)/results[[2]]$theoretical, main = "Cov(X,Y) errors diff percentage")
-  hist((results[[3]]$observed - results[[3]]$theoretical)/results[[3]]$theoretical, main = "Cov(M,Y) errors diff percentage")
+  hist((XM$observed - XM$theoretical)/XM$theoretical, main = "Cov(X,M) errors diff percentage")
+  hist((XY$observed - XY$theoretical)/XY$theoretical, main = "Cov(X,Y) errors diff percentage")
+  hist((MY$observed - MY$theoretical)/MY$theoretical, main = "Cov(M,Y) errors diff percentage")
   
   summary <- list(XM = list(observed = c(mean(XM$observed),sd(XM$observed),quantile(XM$observed, c(0.025,0.9725))), plug_in = c(mean(XM$plug_in),sd(XM$plug_in)), theory = mean(XM$theoretical)),
                   XY = list(observed = c(mean(XY$observed),sd(XY$observed),quantile(XY$observed, c(0.025,0.9725))), plug_in = c(mean(XY$plug_in),sd(XY$plug_in)), theory = mean(XY$theoretical)),
@@ -119,7 +123,97 @@ arx_mediation_results <- function(results){
   
   summary
 }
-
 # Usage:
 #results <- arx_mediation_summary(iterations = 1000, length = 1000)
 #arx_mediation_results(results)
+
+
+# `testing_vars` gives the estimated value of parameters for different true values to compare how they change
+# Usage:
+# vals <- seq(0.1,0.9,0.1)
+# testing_vars(vals)
+testing_vars <- function(vals){
+  n <- length(vals)
+  means <- data.frame(beta0 = NA, beta1 = NA, intercept = NA, true_beta0 = NA, true_beta1 = NA)
+  j <- 0
+  
+  for (i in vals) {
+    j <- j + 1
+    u <- 0
+    for (k in vals) {
+      u <- u + 1
+      m <- 9*(j-1) + u
+      results <- arx_mediation_summary(iterations = 100, length = 1000, beta = c(i,k))
+      newmeans <- colMeans(results$params_m)
+      #print(c(i,j))
+      #print(colMeans(results$params_m))
+      means[m,1] <- newmeans[[1]]
+      means[m,2] <- newmeans[[2]]
+      means[m,3] <- newmeans[[3]]
+      means[m,4] <- i
+      means[m,5] <- k
+      #print(means)
+    }
+  }
+  
+  means
+}
+
+testing_processing <- function(means){
+  beta0_diff <- means[,1] - means[,4]
+  beta1_diff <- means[,2] - means[,5]
+  
+  output <- data.frame(beta0_diff, beta1_diff)
+  output
+}
+
+# this function uses ggplot2 to plot the estimates of the parameters and compare them to the true values
+# usage:
+# results <- arx_mediation_summary(iterations = 1000, length = 1000)
+# testing_plotting(results)
+testing_plotting <- function(results){
+  library(ggplot2)
+  
+  data_alpha <- data.frame(alpha = results$params_x$alpha)
+  
+  alphas <- ggplot(data_alpha, aes(x="", y=alpha)) + 
+              geom_violin() + 
+              #geom_boxplot() +
+              geom_segment(aes(x = 0.5, xend = 1.5, y = 0.5, yend = 0.5),
+                           color = 'red',
+                           linewidth = 1) +
+              labs(title = "Violin plot of Alpha estimates",
+                   y = "alpha")
+  
+  n <- length(results$params_m$beta0)
+  data_beta <- data.frame(var = c(rep("beta_0", n), rep("beta_1",n)), results = c(results$params_m$beta0,results$params_m$beta1))
+  betas <- ggplot(data_beta, aes(x=var, y=results)) + 
+              geom_violin() + 
+              #geom_boxplot() +
+              geom_segment(aes(x = 0.5, xend = 1.5, y = 0.2, yend = 0.2),
+                           color = 'red',
+                           linewidth = 1) +
+              geom_segment(aes(x = 1.5, xend = 2.5, y = 0.8, yend = 0.8),
+                           color = 'red',
+                           linewidth = 1) +
+              labs(title = "Violin plot of Beta estimates",
+                   y = "Beta")
+  
+  data_eta <- data.frame(var = c(rep("eta_0", n), rep("eta_1",n), rep("eta_2",n)), results = c(results$params_y$eta0,results$params_y$eta1, results$params_y$eta2))
+  etas <- ggplot(data_eta, aes(x=var, y=results)) + 
+            geom_violin() + 
+            #geom_boxplot() +
+            geom_segment(aes(x = 0.5, xend = 1.5, y = 0.4, yend = 0.4),
+                         color = 'red',
+                         linewidth = 1) +
+            geom_segment(aes(x = 1.5, xend = 2.5, y = 0.5, yend = 0.5),
+                         color = 'red',
+                         linewidth = 1) +
+            geom_segment(aes(x = 2.5, xend = 3.5, y = 0.6, yend = 0.6),
+                         color = 'red',
+                         linewidth = 1) +
+            labs(title = "Violin plot of Eta estimates",
+                 y = "Eta")
+  
+  list(alpha <- alphas, beta <- betas, eta <- etas)
+}
