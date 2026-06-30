@@ -58,13 +58,13 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1), theore
 # y <- arima.sim(list(ar = 0.4), 100) + 0.3 * m[-101] + 0.5 * X[c(-101,-102)]
 # M <- append(NA,m)
 # Y <- append(c(NA,NA),y)
-# 
+
 # xp <- 1
 # mp <- 1
 # yp <- 1
 
 # A function that simulates mutliple iterations of the previous function
-arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5, beta = c(0.2,0.8)){
+arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5, beta = c(0.2,0.8), eta = c(0.4,0.5,0.6)){
   resultsXM <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   resultsXY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   resultsMY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
@@ -73,9 +73,6 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5,
   params_y <- data.frame(eta0 = NA, eta1 = NA, eta2 = NA, intercept = NA)
   
   n <- length
-  #alpha <- 0.5
-  #beta <- c(0.2,0.8)
-  eta <- c(0.4,0.5,0.6)
   
   XM_theory <- (beta[2]^2)/((1-alpha^2)^2 * (1-beta[1]^2))
   XY_theory <- ((eta[2]^2 * beta[2]^2)+(eta[3]^2 * (1-beta[1]^2)))/((1-alpha^2)^2 * (1-beta[1]^2) * (1-eta[1]^2))
@@ -85,6 +82,12 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5,
     X <- arima.sim(list(ar = alpha), n, sd = 1)
     M <- arima.sim(list(ar = beta[1]), n-1, sd = 1) + beta[2] * X[-n]
     Y <- arima.sim(list(ar = eta[1]), (n-2), sd = 1) + eta[2] * M[-(n-1)] + eta[3] * X[-c(n-1,n)]
+    
+    # scale/center the data
+    X <- (X- mean(X))/sd(X)
+    M <- (M - mean(M))/sd(M)
+    Y <- (Y - mean(Y))/sd(Y)
+    #
     
     M <- append(NA, M)
     Y <- append(c(NA,NA), Y)
@@ -101,7 +104,7 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5,
     params_y[i,] <- result$paramsY
   }
   
-  list(XM = resultsXM, XY = resultsXY, MY = resultsMY, params_x = params_x, params_m = params_m, params_y = params_y, example_data)
+  list(XM = resultsXM, XY = resultsXY, MY = resultsMY, params_x = params_x, params_m = params_m, params_y = params_y, example = example_data, true_params = list(alpha = alpha, beta = beta, eta = eta))
 }
 
 # collate the results
@@ -136,6 +139,7 @@ testing_vars <- function(vals){
   n <- length(vals)
   means <- data.frame(beta0 = NA, beta1 = NA, intercept = NA, true_beta0 = NA, true_beta1 = NA)
   j <- 0
+  plots <- data.frame()
   
   for (i in vals) {
     j <- j + 1
@@ -153,6 +157,8 @@ testing_vars <- function(vals){
       means[m,4] <- i
       means[m,5] <- k
       #print(means)
+      
+      plot[j,m] <- testing_plotting(results)
     }
   }
   
@@ -169,17 +175,21 @@ testing_processing <- function(means){
 
 # this function uses ggplot2 to plot the estimates of the parameters and compare them to the true values
 # usage:
-# results <- arx_mediation_summary(iterations = 1000, length = 1000)
+# results <- arx_mediation_summary(iterations = 1000, length = 1000, beta = c(0.2,0.8))
 # testing_plotting(results)
 testing_plotting <- function(results){
   library(ggplot2)
+  
+  alpha_true <- results$true_params$alpha
+  beta_true <- results$true_params$beta
+  eta_true <- results$true_params$eta
   
   data_alpha <- data.frame(alpha = results$params_x$alpha)
   
   alphas <- ggplot(data_alpha, aes(x="", y=alpha)) + 
               geom_violin() + 
               #geom_boxplot() +
-              geom_segment(aes(x = 0.5, xend = 1.5, y = 0.5, yend = 0.5),
+              geom_segment(aes(x = 0.5, xend = 1.5, y = alpha_true, yend = alpha_true),
                            color = 'red',
                            linewidth = 1) +
               labs(title = "Violin plot of Alpha estimates",
@@ -190,10 +200,10 @@ testing_plotting <- function(results){
   betas <- ggplot(data_beta, aes(x=var, y=results)) + 
               geom_violin() + 
               #geom_boxplot() +
-              geom_segment(aes(x = 0.5, xend = 1.5, y = 0.2, yend = 0.2),
+              geom_segment(aes(x = 0.5, xend = 1.5, y = beta_true[1], yend = beta_true[1]),
                            color = 'red',
                            linewidth = 1) +
-              geom_segment(aes(x = 1.5, xend = 2.5, y = 0.8, yend = 0.8),
+              geom_segment(aes(x = 1.5, xend = 2.5, y = beta_true[2], yend = beta_true[2]),
                            color = 'red',
                            linewidth = 1) +
               labs(title = "Violin plot of Beta estimates",
@@ -203,13 +213,13 @@ testing_plotting <- function(results){
   etas <- ggplot(data_eta, aes(x=var, y=results)) + 
             geom_violin() + 
             #geom_boxplot() +
-            geom_segment(aes(x = 0.5, xend = 1.5, y = 0.4, yend = 0.4),
+            geom_segment(aes(x = 0.5, xend = 1.5, y = eta_true[1], yend = eta_true[1]),
                          color = 'red',
                          linewidth = 1) +
-            geom_segment(aes(x = 1.5, xend = 2.5, y = 0.5, yend = 0.5),
+            geom_segment(aes(x = 1.5, xend = 2.5, y = eta_true[2], yend = eta_true[2]),
                          color = 'red',
                          linewidth = 1) +
-            geom_segment(aes(x = 2.5, xend = 3.5, y = 0.6, yend = 0.6),
+            geom_segment(aes(x = 2.5, xend = 3.5, y = eta_true[3], yend = eta_true[3]),
                          color = 'red',
                          linewidth = 1) +
             labs(title = "Violin plot of Eta estimates",
