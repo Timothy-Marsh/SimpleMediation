@@ -12,13 +12,13 @@ arx_mediation <- function(X, M, Y, params = list(xp = 1, mp = 1, yp = 1), theore
   # create models
   Xt <- arima(X, order = c(xp,0,0))
   
-  Mt <- arima(M, order = c(mp,0,0), xreg = X)
+  Mt <- arima(M[-1], order = c(mp,0,0), xreg = X[-n])
   
   # Xy <- X[-c(n-1,n)]
   # My <- M[-c(n-1)]
-  xreg <- data.frame(M,X)
+  xreg <- data.frame(M[-n],X[-n])
   
-  Yt <- arima(Y, order = c(yp,0,0), xreg = xreg)
+  Yt <- arima(Y[-1], order = c(yp,0,0), xreg = xreg)
   
   # extract the coefficients
   alpha <- Xt$coef
@@ -72,25 +72,29 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5,
   params_m <- data.frame(beta0 = NA, beta1 = NA, intercept = NA)
   params_y <- data.frame(eta0 = NA, eta1 = NA, eta2 = NA, intercept = NA)
   
-  n <- length
-  
   XM_theory <- (beta[2]^2)/((1-alpha^2)^2 * (1-beta[1]^2))
   XY_theory <- ((eta[2]^2 * beta[2]^2)+(eta[3]^2 * (1-beta[1]^2)))/((1-alpha^2)^2 * (1-beta[1]^2) * (1-eta[1]^2))
   MY_theory <- (eta[2]^2)/((1-beta[1]^2)^2 * (1-eta[1]^2)) + ((eta[2]^2 * beta[2]^4)+(eta[3]^2 * (1-beta[1]^2) * beta[2]^2))/((1-alpha^2)^2 * (1-beta[1]^2)^2 * (1-eta[1]^2))
   
   for (i in 1:iterations) {
-    X <- arima.sim(list(ar = alpha), n, sd = 1)
-    M <- arima.sim(list(ar = beta[1]), n-1, sd = 1) + beta[2] * X[-n]
-    Y <- arima.sim(list(ar = eta[1]), (n-2), sd = 1) + eta[2] * M[-(n-1)] + eta[3] * X[-c(n-1,n)]
+    sims <- arx_simulation(length, alpha = alpha, beta = beta, eta = eta, initials = c(0,0,0))
     
-    # scale/center the data
-    X <- (X- mean(X))/sd(X)
-    M <- (M - mean(M))/sd(M)
-    Y <- (Y - mean(Y))/sd(Y)
-    #
+    X <- sims$X
+    M <- sims$M
+    Y <- sims$Y
     
-    M <- append(NA, M)
-    Y <- append(c(NA,NA), Y)
+    # X <- arima.sim(list(ar = alpha), n, sd = 1)
+    # M <- arima.sim(list(ar = beta[1]), n-1, sd = 1) + beta[2] * X[-n]
+    # Y <- arima.sim(list(ar = eta[1]), (n-2), sd = 1) + eta[2] * M[-(n-1)] + eta[3] * X[-c(n-1,n)]
+    # 
+    # # scale/center the data
+    # X <- (X- mean(X))/sd(X)
+    # M <- (M - mean(M))/sd(M)
+    # Y <- (Y - mean(Y))/sd(Y)
+    # #
+    # Using new simulation method we won't need these, since we set the initial values to be 0's
+    #M <- append(NA, M)
+    #Y <- append(c(NA,NA), Y)
     
     example_data <- head(data.frame(X,M,Y))
     
@@ -139,7 +143,7 @@ testing_vars <- function(vals){
   n <- length(vals)
   means <- data.frame(beta0 = NA, beta1 = NA, intercept = NA, true_beta0 = NA, true_beta1 = NA)
   j <- 0
-  plots <- data.frame()
+  #plots <- data.frame()
   
   for (i in vals) {
     j <- j + 1
@@ -158,7 +162,7 @@ testing_vars <- function(vals){
       means[m,5] <- k
       #print(means)
       
-      plot[j,m] <- testing_plotting(results)
+      #plot[j,m] <- testing_plotting(results)
     }
   }
   
@@ -175,7 +179,7 @@ testing_processing <- function(means){
 
 # this function uses ggplot2 to plot the estimates of the parameters and compare them to the true values
 # usage:
-# results <- arx_mediation_summary(iterations = 1000, length = 1000, beta = c(0.2,0.8))
+# results <- arx_mediation_summary(iterations = 1000, length = 1000, alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))
 # testing_plotting(results)
 testing_plotting <- function(results){
   library(ggplot2)
