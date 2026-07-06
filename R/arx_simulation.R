@@ -19,13 +19,13 @@ arx_simulation <- function(sample_length, alpha = 0.5, beta = c(0.2,0.8), eta = 
   
   list(X = tail(X, sample_length), M = tail(M, sample_length), Y = tail(Y, sample_length))
 }
-
-res <- arx_simulation(1000)
-X <- res$X
-M <- res$M
-Y <- res$Y
-
-arima(X, order = c(1,0,0))
-arima(M[-1], order = c(1,0,0), xreg = X[-1000])
-xregs <- data.frame(M[-1000],X[-1000])
-arima(Y[-1], order = c(1,0,0), xreg = xregs)
+# 
+# res <- arx_simulation(1000)
+# X <- res$X
+# M <- res$M
+# Y <- res$Y
+# 
+# arima(X, order = c(1,0,0))
+# arima(M[-1], order = c(1,0,0), xreg = X[-1000])
+# xregs <- data.frame(M[-1000],X[-1000])
+# arima(Y[-1], order = c(1,0,0), xreg = xregs)
