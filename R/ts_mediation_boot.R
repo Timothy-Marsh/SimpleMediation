@@ -2,6 +2,7 @@
 #'
 #' @param data A data frame containing vectors of time series data
 #' @param p A vector of values for the degree of the ar model for the X,M,Y
+#' @param q A vector of values for the degree of the ma model for the X,M,Y, defaults to 0
 #' @param R An integer for the number of bootstrap replicates used
 #'
 #' @return A named list which includes an estimate of the time series, and the bootstrap results
@@ -9,8 +10,11 @@
 #' @export
 #'
 #' @examples
-#' x <- rnorm(100)
-#' ts_simple_resid_boot(x, 2, 50)
+# x <- rnorm(100)
+# m <- rnorm(100)
+# y <- rnorm(100)
+# data <- data.frame(x,m,y)
+# ts_mediation_boot(data, p = c(1,1,1), R = 50)
 
 ts_mediation_boot <- function(data, p, q = c(0,0,0), R) {
   # add something here to check the type of data given and do different things with it, not necessarily needed depending on what other functions are created
@@ -66,17 +70,17 @@ ts_mediation_boot <- function(data, p, q = c(0,0,0), R) {
     }
   }
   
-  # do mediation on the time series
-  direct <- c()
-  indirect <- c()
-  for (i in seq(1:R)) {
-    tempData <- boot_reps[[i]]
-    respMod <- arima(tempData$samp_M, order = c(p[2],0,q[2]), xreg = tempData$samp_X)
-    fullMod <- arima(tempData$samp_Y, order = c(p[2],0,q[2]), xreg = data.frame(x = tempData$samp_X, m = tempData$samp_M))
-    
-    indirect[i] <- respMod$coef[3] * fullMod$coef[4]
-    direct[i] <- fullMod$coef[3]
-  }
+  # # do mediation on the time series
+  # direct <- c()
+  # indirect <- c()
+  # for (i in seq(1:R)) {
+  #   tempData <- boot_reps[[i]]
+  #   respMod <- arima(tempData$samp_M, order = c(p[2],0,q[2]), xreg = tempData$samp_X)
+  #   fullMod <- arima(tempData$samp_Y, order = c(p[3],0,q[3]), xreg = data.frame(x = tempData$samp_X, m = tempData$samp_M))
+  #   
+  #   indirect[i] <- respMod$coef[3] * fullMod$coef[4]
+  #   direct[i] <- fullMod$coef[3]
+  # }
   # return a named list with the model and the boostrap replications
   list(model = mods, bootReps = boot_reps)
 }
