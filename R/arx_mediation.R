@@ -69,8 +69,8 @@ arx_mediation_summary <- function(iterations = 1000, length = 1000, alpha = 0.5,
   resultsXY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   resultsMY <- data.frame(observed = NA, plug_in = NA, theoretical = NA)
   params_x <- data.frame(alpha = NA, intercept = NA)
-  params_m <- data.frame(beta0 = NA, beta1 = NA, intercept = NA)
-  params_y <- data.frame(eta0 = NA, eta1 = NA, eta2 = NA, intercept = NA)
+  params_m <- data.frame(beta1 = NA, beta2 = NA, intercept = NA)
+  params_y <- data.frame(eta1 = NA, eta2 = NA, eta3 = NA, intercept = NA)
   
   XM_theory <- (beta[2]^2)/((1-alpha^2)^2 * (1-beta[1]^2))
   XY_theory <- ((eta[2]^2 * beta[2]^2)+(eta[3]^2 * (1-beta[1]^2)))/((1-alpha^2)^2 * (1-beta[1]^2) * (1-eta[1]^2))
@@ -169,7 +169,7 @@ testing_vars <- function(vals){
   means
 }
 
-testing_processing <- function(means){
+testing_summary <- function(means){
   beta0_diff <- means[,1] - means[,4]
   beta1_diff <- means[,2] - means[,5]
   
@@ -180,9 +180,33 @@ testing_processing <- function(means){
 # this function uses ggplot2 to plot the estimates of the parameters and compare them to the true values
 # usage:
 # results <- arx_mediation_summary(iterations = 1000, length = 1000, alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))
-# testing_plotting(results)
-testing_plotting <- function(results){
+# arx_plotting(results)
+arx_plotting <- function(results){
   library(ggplot2)
+  
+  if (is.null(results$true_params$alpha)) {
+    data_alpha <- data.frame(alpha = results$params_x$alpha)
+    
+    alphas <- ggplot(data_alpha, aes(x="", y=alpha)) + 
+      geom_violin() + 
+      labs(title = "Violin plot of Alpha estimates",
+           y = "alpha")
+    
+    n <- length(results$params_m$beta1)
+    data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
+    betas <- ggplot(data_beta, aes(x=var, y=results)) + 
+      geom_violin() + 
+      labs(title = "Violin plot of Beta estimates",
+           y = "Beta")
+    
+    data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
+    etas <- ggplot(data_eta, aes(x=var, y=results)) + 
+      geom_violin() + 
+      labs(title = "Violin plot of Eta estimates",
+           y = "Eta")
+    
+    return(list(alpha <- alphas, beta <- betas, eta <- etas))
+  }
   
   alpha_true <- results$true_params$alpha
   beta_true <- results$true_params$beta
@@ -199,8 +223,8 @@ testing_plotting <- function(results){
               labs(title = "Violin plot of Alpha estimates",
                    y = "alpha")
   
-  n <- length(results$params_m$beta0)
-  data_beta <- data.frame(var = c(rep("beta_0", n), rep("beta_1",n)), results = c(results$params_m$beta0,results$params_m$beta1))
+  n <- length(results$params_m$beta1)
+  data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
   betas <- ggplot(data_beta, aes(x=var, y=results)) + 
               geom_violin() + 
               #geom_boxplot() +
@@ -213,7 +237,7 @@ testing_plotting <- function(results){
               labs(title = "Violin plot of Beta estimates",
                    y = "Beta")
   
-  data_eta <- data.frame(var = c(rep("eta_0", n), rep("eta_1",n), rep("eta_2",n)), results = c(results$params_y$eta0,results$params_y$eta1, results$params_y$eta2))
+  data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
   etas <- ggplot(data_eta, aes(x=var, y=results)) + 
             geom_violin() + 
             #geom_boxplot() +

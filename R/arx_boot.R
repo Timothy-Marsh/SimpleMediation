@@ -10,10 +10,10 @@
 #' @examples
 #' arx_boot(500)
 
-arx_boot <- function(boot_reps = 100, params = list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))){
+arx_boot <- function(boot_reps = 100, sim_length = 1000, params = list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))){
   
   #simulate the data
-  data <- arx_simulation(1000, alpha = params$alpha, beta = params$beta, eta = params$eta, initials = c(0,0,0))
+  data <- arx_simulation(sim_length, alpha = params$alpha, beta = params$beta, eta = params$eta, initials = c(0,0,0))
   
   # get bootstrap replicates of the data
   
