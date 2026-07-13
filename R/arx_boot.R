@@ -21,7 +21,7 @@ arx_boot <- function(boot_reps = 100, sim_length = 1000, params = list(alpha = 0
   data <- data.frame(X = data$X, M = data$M, Y = data$Y)
   
     # using `ts_mediation_boot`
-  boots <- ts_mediation_boot(data, p = c(1,1,1), R = boot_reps)
+  boots <- arx_mediation_boot(data, p = c(1,1,1), R = boot_reps)
   
   boots$bootReps
 }
