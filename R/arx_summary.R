@@ -10,7 +10,7 @@
 #' boots <- arx_boot(500)
 #' arx_summary(boots)
 
-arx_summary <- function(boots){
+arx_summary <- function(boots, params){
   n <- length(boots)
   m <- length(boots[[1]]$X)
   
@@ -27,7 +27,7 @@ arx_summary <- function(boots){
   for (i in seq(1,n)) {
     mod_X <- arima(boots[[i]]$X, order = c(1,0,0))
     mod_M <- arima(boots[[i]]$M[-1], order = c(1,0,0), xreg = boots[[i]]$X[-m])
-    mod_Y <- arima(boots[[i]]$Y[-1], order = c(1,0,0), xreg = data.frame(boots[[i]]$X[-m], boots[[i]]$M[-m]))
+    mod_Y <- arima(boots[[i]]$Y[-1], order = c(1,0,0), xreg = data.frame(boots[[i]]$M[-m], boots[[i]]$X[-m]))
     
     alpha[i] <- mod_X$coef[[1]]
     beta[i,] <- c(mod_M$coef[[1]], mod_M$coef[[3]])
@@ -42,5 +42,5 @@ arx_summary <- function(boots){
   params_m <- list(beta1 = beta[,1], beta2 = beta[,2])
   params_y <- list(eta1 = eta[,1], eta2 = eta[,2], eta3 = eta[,3])
   
-  list(covariances = list(XM = cov_XM, XY = cov_XY, MY = cov_MY), params_x = params_x, params_m = params_m, params_y = params_y)
+  list(covariances = list(XM = cov_XM, XY = cov_XY, MY = cov_MY), params_x = params_x, params_m = params_m, params_y = params_y, true_params = params)
 }

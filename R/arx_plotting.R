@@ -7,8 +7,8 @@
 #' @export
 #'
 #' @examples
-#' boots <- arx_boot(500)
-#' boots2 <- arx_summary(boots)
+#' boots <- arx_boot(500, params = list(alpha = 0.2, beta = c(0.1,0.5), eta = c(0.2,0.3,0.6)))
+#' boots2 <- arx_summary(boots, params = list(alpha = 0.2, beta = c(0.1,0.5), eta = c(0.2,0.3,0.6)))
 #' arx_plotting(boots2)
 
 arx_plotting <- function(results){
@@ -83,5 +83,30 @@ arx_plotting <- function(results){
     labs(title = "Violin plot of Eta estimates",
          y = "Eta")
   
-  list(alpha <- alphas, beta <- betas, eta <- etas)
+  true_XM <- (beta_true[2]^2)/((1-alpha_true^2)^2 * (1-beta_true[1]^2))
+  true_XY <- ((eta_true[2]^2 * beta_true[2]^2)+(eta_true[3]^2 * (1-beta_true[1]^2)))/((1-alpha_true^2)^2 * (1-beta_true[1]^2) * (1-eta_true[1]^2))
+  true_MY <- (eta_true[2]^2)/((1-beta_true[1]^2)^2 * (1-eta_true[1]^2)) + ((eta_true[2]^2 * beta_true[2]^4)+(eta_true[3]^2 * (1-beta_true[1]^2) * beta_true[2]^2))/((1-alpha_true^2)^2 * (1-beta_true[1]^2)^2 * (1-eta_true[1]^2))
+    
+  data_XM <- data.frame(results = results$covariances$XM, x = rep("Cov(X,M)", n))
+  cov_XM <- ggplot(data_XM, aes(y = results, x = x)) + 
+    geom_violin() +
+    geom_segment(aes(x = 0.5, xend = 1.5, y = true_XM, yend = true_XM),
+                 color = 'red',
+                 linewidth = 1)
+  
+  data_XY <- data.frame(results = results$covariances$XY, x = rep("Cov(X,Y)", n))
+  cov_XY <- ggplot(data_XY, aes(y = results, x = x)) + 
+    geom_violin() +
+    geom_segment(aes(x = 0.5, xend = 1.5, y = true_XY, yend = true_XY),
+                 color = 'red',
+                 linewidth = 1)
+  
+  data_MY <- data.frame(results = results$covariances$MY, x = rep("Cov(M,Y)", n))
+  cov_MY <- ggplot(data_MY, aes(y = results, x = x)) + 
+    geom_violin()  +
+    geom_segment(aes(x = 0.5, xend = 1.5, y = true_MY, yend = true_MY),
+                 color = 'red',
+                 linewidth = 1)
+  
+  list(alpha <- alphas, beta <- betas, eta <- etas, cov_XM, cov_XY, cov_MY)
 }
