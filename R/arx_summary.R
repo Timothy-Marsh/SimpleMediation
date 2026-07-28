@@ -4,13 +4,11 @@
 #'
 #' @return 
 #'
-#' @export
-#'
 #' @examples
 #' boots <- arx_boot(500)
 #' arx_summary(boots)
 
-arx_summary <- function(boots, params){
+arx_summary <- function(boots, params = list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))){
   n <- length(boots)
   m <- length(boots[[1]]$X)
   
@@ -43,4 +41,12 @@ arx_summary <- function(boots, params){
   params_y <- list(eta1 = eta[,1], eta2 = eta[,2], eta3 = eta[,3])
   
   list(covariances = list(XM = cov_XM, XY = cov_XY, MY = cov_MY), params_x = params_x, params_m = params_m, params_y = params_y, true_params = params)
+}
+
+
+arx_summary_effects <- function(summary_arx){
+  indirect <- summary_arx$params_m$beta2 * summary_arx$params_y$eta2
+  direct <- summary_arx$params_y$eta3
+  
+  data.frame(indirect, direct)
 }

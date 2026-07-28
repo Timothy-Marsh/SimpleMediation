@@ -108,5 +108,24 @@ arx_plotting <- function(results){
                  color = 'red',
                  linewidth = 1)
   
-  list(alpha <- alphas, beta <- betas, eta <- etas, cov_XM, cov_XY, cov_MY)
+  param_estimates <- data.frame(alpha = results$params_x$alpha, beta1 = results$params_m$beta1, beta2 = results$params_m$beta2, eta1 = results$params_y$eta1, eta2 = results$params_y$eta2, eta3 = results$params_y$eta3)
+  cov_matrix <- cov(param_estimates)
+  cov_df <- as.data.frame(as.table(cov_matrix))
+  names(cov_df) <- c("Var1", "Var2", "Covariance")
+  
+  cov_plot <- ggplot(cov_df, aes(x = Var1, y = Var2, fill = Covariance)) + 
+                geom_tile(color = "white") +
+                scale_fill_gradient2(
+                  low = "blue", mid = "white", high = "red", midpoint = 0,
+                  name = "Covariance"
+                ) +
+                theme_minimal(base_size = 14) +
+                theme(
+                  axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+                  panel.grid = element_blank()
+                ) +
+                coord_fixed() +
+                labs(title = "Covariance Matrix Heatmap")
+  
+  list(alpha <- alphas, beta <- betas, eta <- etas, cov_XM, cov_XY, cov_MY, cov_plot)
 }
