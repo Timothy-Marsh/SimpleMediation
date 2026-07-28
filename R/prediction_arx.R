@@ -58,3 +58,14 @@ prediction_arx <- function(data, p = 10){
   
   c(indirect_summary[1], direct_summary[1])
 }
+
+# pred_arx_sum(boots)
+pred_arx_sum <- function(boots){
+  n <- length(boots)
+  out <- data.frame(matrix(nrow = n, ncol = 2))
+  for (i in 1:n) {
+    out[i,] <- prediction_arx(boots[[i]])
+  }
+  
+  out
+}

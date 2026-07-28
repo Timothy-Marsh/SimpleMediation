@@ -43,7 +43,9 @@ arx_summary <- function(boots, params = list(alpha = 0.5, beta = c(0.2,0.8), eta
   list(covariances = list(XM = cov_XM, XY = cov_XY, MY = cov_MY), params_x = params_x, params_m = params_m, params_y = params_y, true_params = params)
 }
 
-
+# boots <- arx_boot(500)
+# summary <- arx_summary(boots)
+# arx_summary_effects(summary)
 arx_summary_effects <- function(summary_arx){
   indirect <- summary_arx$params_m$beta2 * summary_arx$params_y$eta2
   direct <- summary_arx$params_y$eta3
