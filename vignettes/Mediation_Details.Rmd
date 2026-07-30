@@ -356,6 +356,17 @@ I will not be exploring much on this topic in this thesis, but it is an interest
 
 ## Simulation of theoretical results
 
+We used R to simulate the results found so far. The simulations show good estimates of the true parameters from using the bootstrap on an ARX system. Since there is dependence between the three variables the bootstrap must be implemented carefully, and is done in the following way.
+
+1.  An ARX system is simulated with the desired parameter values specified.
+2.  The models $f_M$ and $f_Y$ are created, and their residuals are captured along with their parameters.
+3.  The residuals of these models are then used to create $R$ bootstrap replicates of these residuals.
+4.  For each bootstrap replicate the ARX system is reconstructed carefully accounting for the dependence structure present, using the parameters found in step 2 along with the specific set of bootstrapped residuals.
+
+This will produce $R$ bootstrap replicates of the ARX system in a way that preserves the dependence structure between each variable. There is some small covariance between the parameter estimates, however it is not large.
+
+All the code used in the simulations is publicly available in a GitHub: \`<https://github.com/Timothy-Marsh/SimpleMediation>\`.
+
 ## Conclusion of ARX Mediation
 
 The derivations in this section explain mediation for ARX(1) models, including their theoretical variances and covariances.
