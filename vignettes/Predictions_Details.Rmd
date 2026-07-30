@@ -1,0 +1,69 @@
+---
+title: "Predictions_Details"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Predictions_Details}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimpleMediation)
+```
+
+# Prediction Based Estimates
+
+We now attempt to find prediction based estimates for the direct and indirect effects. This section details what specifically we are looking for, and how we estimated them from simulated data.
+
+## The effects of interest
+
+We are looking at the variety of ways that $X_{t-2}$ impacts $Y_t$, the overall effect can be broadly broken down into the natural direct and natural indirect effects. But in a time series context these become more complicated and we can break down the direct effect into several components as discussed earlier. The effects that we are interested in are the self-mediated direct effect, cross-mediated direct effect, and the mediated/indirect effect.
+
+The mediated or indirect effect is the effect of $X_{t-2}$ on $Y_t$ when being mediated through variable $M_{t-1}$.
+
+The self-mediated direct effect is the effect of $X_{t-2}$ on $Y_t$ through $X_{t-1}$.
+
+The cross-mediated direct effect is the effect of $X_{t-2}$ on $Y_t$ though $Y_{t-1}$.
+
+## The algorithm
+
+A prediction based method to find these estimates. We are assuming that the data given contains $X$, $M$, and $Y$, and we are interested in finding the effects of $X_{t-2}$ on $Y_t$ mediated through several pathways. We assume that there is a time series element to the data, in this case AR(1), but the method should be generalizable to other types of assumed causality.
+
+### Prediction Models
+
+We start by building models for $Y_t$ and $M_t$ from the data, the objective will be to use these models to make predictions, which will in turn be used to find the direct and indirect effects. The particular type of model used here can be anything, the data we are using is time series data and the models will take this into account in how they are built.
+
+1.  The model of choice is then used to created to a model $f_Y()$ to estimate $Y_t$ based on the values for $X_{t-1}$, $M_{t-1}$, and $Y_{t-1}$. That is: $Y_t = f_Y(Y_{t-1},M_{t-1},X_{t-1})$
+2.  A similar model is constructed for $M_{t-1}$ based on $X_{t-2}$, and $M_{t-2}$, or $M_{t-1} = f_M(M_{t-2},X_{t-2})$. We also note that since we are assuming stationarity in $M$ this model will also work for predicting $M_t$ and $M_{t-2}$.
+
+### Test Points
+
+We then construct a series of $X'$, $M'$, and $Y'$ values to use as changed or different value for these variables to use in the calculation of $Y$. These series are a vector of possible values that $X$, $M$, and $Y$ can take.
+
+3.  The series of $X'_{t-2}$ values are from the minimum $X$ value to the maximum $X$ value in increments of a size to give $p$ partitions, where $p$ is chosen by us to be 11 initially. These $X'_{t-2}$ values will then also be used as $X'_{t-1}$.
+4.  The $M_{t-1}'$ values are constructed by using the range of $X'_{t-2}$ values we just found and predicting what the $M_{t-1}$ value for each of them should be using our model for $M_{t}$ built in step 2.
+5.  Constructing $Y'_{t-1}$ will be important in the estimation of the cross-mediated direct effect. An estimate of it can be constructed using $f_Y(Y_{t-2},M'_{t-2},X'_{t-2})$
+6.  \^(We are implicitly assuming stationary here, I need to make sure to address this elsewhere, and why it's ok to assume. I think I've done this but this note is here to remind me if I forget :)
+
+### Prediction Step
+
+Using the series of values we just found. We construct several quantities which we will use to find the desired effects. These are based on the prior theory about changing the values for one input to our function for $Y$ and holding the others constant. We will be changing specific inputs to the model for $Y_t$ to find an estimate for all 3 of the effects.
+
+6.  To find the estimate for the indirect effect, we calculate $f_Y(Y_{t-1},M'_{t-1},X_{t-1}) - f_Y(Y_{t-1},M_{t-1},X_{t-1})$ for every value in $M'_{t-1}$ while holding $X_{t-1}$, $M_{t-1}$ and $Y_{t-1}$ constant. This will isolate the effects of changing only $M$.
+
+7.  To find the estimate for the self-mediated direct effect, we calculate $f_Y(Y_{t-1},M_{t-1},X'_{t-1}) - f_Y(Y_{t-1},M_{t-1},X_{t-1})$ for every value in $X'_{t-1}$ while holding $X_{t-1}$, $M_{t-1}$ and $Y_{t-1}$ constant.
+
+8.  To find the estimate for the cross-mediated direct effect, we calculate $f_Y(Y'_{t-1},M_{t-1},X_{t-1}) - f_Y(Y_{t-1},M_{t-1},X_{t-1})$ for every value in $Y'_{t-1}$ while holding $X_{t-1}$, $M_{t-1}$ and $Y_{t-1}$ constant.
+
+We will be left with three vectors of length $p$ representing the impact of changing one variable to a specific value. An estimate of the mediation function for each of these can be found by standardizing the difference in these values.
+
+# Future Expansions
+
+This work assumes that a reasonable estimate of the data are AR(1) models, expansions would be to assume a larger time series model such as an AR(2), or other types of dependence such as MA(1), as the foundation for the data. The paths from $X_{t-3}$ to $Y_t$ would then become much more complicated, but of a similar nature to the ones in this AR(1) case.
