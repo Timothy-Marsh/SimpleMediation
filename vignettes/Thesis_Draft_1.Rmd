@@ -1,0 +1,64 @@
+---
+title: "Thesis_Draft_1"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Thesis_Draft_1}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimpleMediation)
+```
+
+# Abstract
+
+# Introduction
+
+# Background/Lit review
+
+## Simple Mediation
+
+## General Non-linear approach
+
+## General Spline stuff
+
+## General time series stuff 
+
+(needed since we're doing a bunch with ARX stuff)
+Some background is needed on time series models, particularly auto-regressive (AR) and auto-regressive models with exogenous inputs (ARX). The 
+
+Reference the book for the time series course I did
+
+This should be a pretty brief section
+
+## Current non-linear mediation stuff
+
+There has been some recent work in the field of mediation analysis, 
+
+A unique aspect of this work is that it assumes a time series structure to the data using ARX models, which includes more causalities than a more traditional mediation relationship. There has been some work done on continuous mediators and treatments, and some on the non-linearity in mediation.
+
+# Method
+
+## Spline stuff from proposal?
+
+## ARX based method
+
+Just copy and paste for this part!
+
+## Prediction based method
+
+Same as above, but add section for how the methods compare in simulations!
+
+## Future Work
+
+Mostly in the assumed structure of the data (have some parts written about this already)
+
+# Conclusion
