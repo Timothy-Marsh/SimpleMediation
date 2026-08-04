@@ -2,7 +2,7 @@
 #'
 #' @param boots A list of data frames, each one being a bootstrap replicate of the data
 #'
-#' @return 
+#' @return Named list
 #'
 #' @examples
 #' boots <- arx_boot(500)

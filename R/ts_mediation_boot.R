@@ -9,12 +9,12 @@
 #'
 #' @export
 #'
-#' @examples
-# x <- rnorm(100)
-# m <- rnorm(100)
-# y <- rnorm(100)
-# data <- data.frame(x,m,y)
-# ts_mediation_boot(data, p = c(1,1,1), R = 50)
+#' @examples 
+#' x <- rnorm(100)
+#' m <- rnorm(100)
+#' y <- rnorm(100)
+#' data <- data.frame(x,m,y)
+#' ts_mediation_boot(data, p = c(1,1,1), R = 50)
 
 ts_mediation_boot <- function(data, p, q = c(0,0,0), R) {
   # add something here to check the type of data given and do different things with it, not necessarily needed depending on what other functions are created
