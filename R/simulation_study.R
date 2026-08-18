@@ -29,20 +29,14 @@ simulation_study <- function(parameters = list(list(alpha = 0.5, beta = c(0.2,0.
   
   # for each set of parameters we need to run the algorithm
   for (i in 1:n) {
-    # alpha <- parameters[[n]]$alpha
-    # beta <- parameters[[n]]$beta
-    # eta <- parameters[[n]]$eta
-    # # simulate the data
-    # data <- arx_simulation(sample_length = sample_length, alpha = alpha, beta = beta, eta = eta)
-    
     # simulate data and get bootstrap replicates
-    data <- arx_boot(boot_reps = boot_reps, sim_length = sample_length, params = parameters[[n]])
+    data <- arx_boot(boot_reps = boot_reps, sim_length = sample_length, params = parameters[[i]])
     
     # on each bootstrap replicate calculate the estimates for the parameters
-    estimates <- arx_summary(data, params = parameters[[n]])
+    estimates <- arx_summary(data, params = parameters[[i]])
     
     # produce violin plots to overlay the results
-    plots[[n]] <- arx_plotting(estimates)
+    plots[[i]] <- arx_plotting(estimates)
     
   }
   
