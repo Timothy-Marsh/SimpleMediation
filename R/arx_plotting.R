@@ -83,9 +83,9 @@ arx_plotting <- function(results){
     labs(title = "Violin plot of Eta estimates",
          y = "Eta")
   
-  true_XM <- (beta_true[2]^2)/((1-alpha_true^2)^2 * (1-beta_true[1]^2))
-  true_XY <- ((eta_true[2]^2 * beta_true[2]^2)+(eta_true[3]^2 * (1-beta_true[1]^2)))/((1-alpha_true^2)^2 * (1-beta_true[1]^2) * (1-eta_true[1]^2))
-  true_MY <- (eta_true[2]^2)/((1-beta_true[1]^2)^2 * (1-eta_true[1]^2)) + ((eta_true[2]^2 * beta_true[2]^4)+(eta_true[3]^2 * (1-beta_true[1]^2) * beta_true[2]^2))/((1-alpha_true^2)^2 * (1-beta_true[1]^2)^2 * (1-eta_true[1]^2))
+  true_XM <- (beta_true[2]*alpha_true)/((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)))
+  true_XY <- ((eta_true[2]^2 * beta_true[2] * eta_true[3])+(eta_true[3]*alpha_true * (1-(beta_true[1]*alpha_true)))) / ((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)) * (1-(eta_true[1]*alpha_true)))
+  true_MY <- (eta_true[2]*beta_true[1])/((1-beta_true[1]^2) * (1-(eta_true[1]*beta_true[1]))) + ((beta_true[1]*(beta_true[2]^2)*eta_true[2] + beta_true[2]*eta_true[3]*(1-(beta_true[1]^2))) / ((1-(alpha_true^2))*(1-(beta_true[1]^2))*(1-(beta_true[1]*eta_true[1])))) + ((alpha_true*beta_true[1]*beta_true[2]*eta_true[3]+alpha_true*beta_true[2]*eta_true[1]*eta_true[3]+alpha_true*(beta_true[2]^2)*eta_true[2]-2*(alpha_true^2)*beta_true[1]*beta_true[2]*eta_true[1]*eta_true[3]) / ((1-(alpha_true^2)) * (1-(beta_true[1]*eta_true[1])) * (1-(alpha_true*beta_true[1])) * (1-(alpha_true*eta_true[1]))))
     
   data_XM <- data.frame(results = results$covariances$XM, x = rep("Cov(X,M)", n))
   cov_XM <- ggplot(data_XM, aes(y = results, x = x)) + 

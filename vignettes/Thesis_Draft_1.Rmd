@@ -59,6 +59,6 @@ Same as above, but add section for how the methods compare in simulations!
 
 ## Future Work
 
-Mostly in the assumed structure of the data (have some parts written about this already)
+Mostly in the assumed structure of the data (have some parts written about this already), also in adding more mediators (shouldn't change the nature of the problem though, mostly th eaccounting of it)
 
 # Conclusion
