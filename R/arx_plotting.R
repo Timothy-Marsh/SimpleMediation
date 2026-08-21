@@ -13,6 +13,7 @@
 
 arx_plotting <- function(results){
   library(ggplot2)
+  library(patchwork)
   
   if (is.null(results$true_params$alpha)) {
     data_alpha <- data.frame(alpha = results$params_x$alpha)
@@ -127,5 +128,8 @@ arx_plotting <- function(results){
                 coord_fixed() +
                 labs(title = "Covariance Matrix Heatmap")
   
-  list(alpha <- alphas, beta <- betas, eta <- etas, cov_XM, cov_XY, cov_MY, cov_plot)
+  covs <- cov_XM+cov_XY+cov_MY
+  params <- alphas + betas + etas
+  
+  list(params <- params, covs <- covs, cov_plot)
 }
