@@ -22,7 +22,7 @@
 simulation_study <- function(parameters = list(list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5)),
                                                list(alpha = 0.1, beta = c(0.1,0.1), eta = c(0.1,0.1,0.1)),
                                                list(alpha = 0.3, beta = c(0.3,0.4), eta = c(0.3,0.4,0.5)),
-                                               list(alpha = 0.7, beta = c(0.6,0.4), eta = c(0.7,0.6,0.9))), sample_length = 500, boot_reps = 100){
+                                               list(alpha = 0.7, beta = c(0.6,0.4), eta = c(0.7,0.6,0.9))), sample_length = 500, sample_reps = 100){
   n <- length(parameters)
   
   plots <- list()
@@ -30,7 +30,11 @@ simulation_study <- function(parameters = list(list(alpha = 0.5, beta = c(0.2,0.
   # for each set of parameters we need to run the algorithm
   for (i in 1:n) {
     # simulate data and get bootstrap replicates
-    data <- arx_boot(boot_reps = boot_reps, sim_length = sample_length, params = parameters[[i]])
+    data <- list()
+      for (j in 1:sample_reps) {
+        data[[j]] <- arx_simulation(sample_length, alpha = parameters[[i]]$alpha, beta = parameters[[i]]$beta, eta = parameters[[i]]$eta, initials = c(0,0,0))
+      }
+    
     
     # on each bootstrap replicate calculate the estimates for the parameters
     estimates <- arx_summary(data, params = parameters[[i]])
