@@ -43,6 +43,10 @@ arx_plotting <- function(results){
   beta_true <- results$true_params$beta
   eta_true <- results$true_params$eta
   
+  indirect_true <- eta_true[2] * beta_true[2]
+  SMDE_true <- eta_true[3] * alpha_true
+  CMDE_true <- eta_true[1] * eta_true[3]
+  
   data_alpha <- data.frame(alpha = results$params_x$alpha)
   
   alphas <- ggplot(data_alpha, aes(x="", y=alpha)) + 
@@ -51,8 +55,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 0.5, xend = 1.5, y = alpha_true, yend = alpha_true),
                  color = 'red',
                  linewidth = 1) +
-    labs(title = "Violin plot of Alpha estimates",
-         y = "alpha")
+    labs( y = "alpha")
   
   n <- length(results$params_m$beta1)
   data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
@@ -65,8 +68,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 1.5, xend = 2.5, y = beta_true[2], yend = beta_true[2]),
                  color = 'red',
                  linewidth = 1) +
-    labs(title = "Violin plot of Beta estimates",
-         y = "Beta")
+    labs( y = "Beta")
   
   data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
   etas <- ggplot(data_eta, aes(x=var, y=results)) + 
@@ -81,8 +83,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 2.5, xend = 3.5, y = eta_true[3], yend = eta_true[3]),
                  color = 'red',
                  linewidth = 1) +
-    labs(title = "Violin plot of Eta estimates",
-         y = "Eta")
+    labs(y = "Eta")
   
   true_XM <- (beta_true[2]*alpha_true)/((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)))
   true_XY <- ((eta_true[2]^2 * beta_true[2] * eta_true[3])+(eta_true[3]*alpha_true * (1-(beta_true[1]*alpha_true)))) / ((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)) * (1-(eta_true[1]*alpha_true)))
@@ -126,10 +127,30 @@ arx_plotting <- function(results){
                   panel.grid = element_blank()
                 ) +
                 coord_fixed() +
-                labs(title = "Covariance Matrix Heatmap")
+                labs(title = "Covariance Matrix Heatmap",
+                     subtitle =bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
   
-  covs <- cov_XM+cov_XY+cov_MY
-  params <- alphas + betas + etas
+  indirect_obs <- results$params_y$eta2 * results$params_m$beta2
+  SMDE_obs <- results$params_y$eta3 * results$params_x$alpha
+  CMDE_obs <- results$params_y$eta1 * results$params_y$eta3
   
-  list(params <- params, covs <- covs, cov_plot)
+  effects_df <- data.frame(results = c(indirect_obs, SMDE_obs, CMDE_obs), Effects = c(rep("Indirect", length(indirect_obs)), rep("SMDE", length(indirect_obs)), rep("CMDE",length(indirect_obs))))
+  effects_plot <- ggplot(effects_df, aes(x = Effects, y = results)) +
+    geom_violin() +
+    geom_segment(aes(x = 0.5, xend = 1.5, y = indirect_true, yend = indirect_true,color = "Theoretical Effect"),
+                 linewidth = 1) + 
+    geom_segment(aes(x = 1.5, xend = 2.5, y = SMDE_true, yend = SMDE_true,color = "Theoretical Effect"),
+                 linewidth = 1) + 
+    geom_segment(aes(x = 2.5, xend = 3.5, y = CMDE_true, yend = CMDE_true, color = "Theoretical Effect"),
+                 linewidth = 1) +
+    labs(title = "Observed Effects from AR based Method", 
+         subtitle = bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3]))) +
+    scale_color_manual(values = c("Theoretical Effect" = 'red'))
+  
+  covs <- cov_XM+cov_XY+cov_MY + plot_annotation(title = "Observed covariances with Theoretical Value",
+                                                 subtitle = bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
+  params <- alphas + betas + etas + plot_annotation(title = "Observed Parameters with Actual Values",
+                                                    subtitle = bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
+  
+  list(params <- params, covs <- covs, cov_plot, effects_plot)
 }
