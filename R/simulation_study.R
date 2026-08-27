@@ -19,19 +19,21 @@
 # - For each of these sets of parameters simulate data
 
 
-simulation_study <- function(parameters = list(list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5)),
+simulation_study <- function(parameters = list(list(alpha = 0.3, beta = c(0.2,0.4), eta = c(0.3,0.2,0.3)),
                                                list(alpha = 0.1, beta = c(0.1,0.1), eta = c(0.1,0.1,0.1)),
+                                               list(alpha = 0.7, beta = c(0.2,0.3), eta = c(0.1,0.3,0.2)),
+                                               list(alpha = 0.8, beta = c(0.4,0.3), eta = c(0.7,0.145,0.1)),
                                                list(alpha = 0.3, beta = c(0.3,0.4), eta = c(0.3,0.4,0.5)),
                                                list(alpha = 0.7, beta = c(0.6,0.4), eta = c(0.7,0.6,0.9)),
-                                               list(alpha = 0.7, beta = c(0.2,0.3), eta = c(0.1,0.3,0.2)),
-                                               list(alpha = 0.6, beta = c(0.6,0.6), eta = c(0.6,0.6,0.6))), sample_length = 500, sample_reps = 100){
+                                               list(alpha = 0.6, beta = c(0.6,0.6), eta = c(0.6,0.6,0.6)),
+                                               list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))), sample_length = 500, sample_reps = 100){
   n <- length(parameters)
   
   plots <- list()
   
   # for each set of parameters we need to run the algorithm
   for (i in 1:n) {
-    # simulate data and get bootstrap replicates
+    # simulate data and get simulation replicates
     data <- list()
     predictions <- list()
       for (j in 1:sample_reps) {
@@ -41,7 +43,7 @@ simulation_study <- function(parameters = list(list(alpha = 0.5, beta = c(0.2,0.
         }
     
     
-    # on each bootstrap replicate calculate the estimates for the parameters
+    # on each simulation replicate calculate the estimates for the parameters
     estimates <- arx_summary(data, params = parameters[[i]])
     
     # produce violin plots to overlay the results
@@ -70,10 +72,10 @@ prediction_plot_helper <- function(predictions, true_params){
   }
   
   predict_df <- data.frame(results = c(predictions_df[,1],predictions_df[,4], predictions_df[,2], predictions_df[,5],predictions_df[,3],predictions_df[,6]),
-                           indicator = c(rep("Indirect",w), rep("theory_NIE",w), rep("Self Mediated",w), rep("theory_SMDE",w),rep("Cross Mediated",w), rep("theory_CMDE",w)))
+                           indicator = c(rep("Prediction NIE",w), rep("AR NIE",w), rep("Prediction SMDE",w), rep("AR SMDE",w),rep("Prediction CMDE",w), rep("AR CMDE",w)))
 
-  ggplot(data = predict_df, aes(x = factor(indicator, levels = c("Indirect","theory_NIE","Self Mediated","theory_SMDE","Cross Mediated","theory_CMDE")), y = results))+
+  ggplot(data = predict_df, aes(x = factor(indicator, levels = c("Prediction NIE","AR NIE","Prediction SMDE","AR SMDE","Prediction CMDE","AR CMDE")), y = results))+
     geom_violin() + 
-    labs(y = "Results", x = "Effect", title = "Prediction Based Effects vs AR Theoretical Effects", 
+    labs(y = "", x = "Effect", title = "Prediction Based Effects vs AR Theoretical Effects", 
          subtitle = bquote(alpha == .(true_params$alpha) ~ ", " ~ beta[0] == .(true_params$beta[1])~ ", " ~ beta[1] == .(true_params$beta[2])~ ", " ~ eta[0] == .(true_params$eta[1])~ ", " ~ eta[1] == .(true_params$eta[2])~ ", " ~ eta[2] == .(true_params$eta[3])) )
   }

@@ -55,7 +55,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 0.5, xend = 1.5, y = alpha_true, yend = alpha_true),
                  color = 'red',
                  linewidth = 1) +
-    labs( y = "alpha")
+    labs( y = "alpha",x = "")
   
   n <- length(results$params_m$beta1)
   data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
@@ -68,7 +68,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 1.5, xend = 2.5, y = beta_true[2], yend = beta_true[2]),
                  color = 'red',
                  linewidth = 1) +
-    labs( y = "Beta")
+    labs( y = "Beta", x = "")
   
   data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
   etas <- ggplot(data_eta, aes(x=var, y=results)) + 
@@ -83,7 +83,7 @@ arx_plotting <- function(results){
     geom_segment(aes(x = 2.5, xend = 3.5, y = eta_true[3], yend = eta_true[3]),
                  color = 'red',
                  linewidth = 1) +
-    labs(y = "Eta")
+    labs(y = "Eta",x = "")
   
   true_XM <- (beta_true[2]*alpha_true)/((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)))
   true_XY <- ((eta_true[2]^2 * beta_true[2] * eta_true[3])+(eta_true[3]*alpha_true * (1-(beta_true[1]*alpha_true)))) / ((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)) * (1-(eta_true[1]*alpha_true)))
@@ -94,21 +94,24 @@ arx_plotting <- function(results){
     geom_violin() +
     geom_segment(aes(x = 0.5, xend = 1.5, y = true_XM, yend = true_XM),
                  color = 'red',
-                 linewidth = 1)
+                 linewidth = 1)+
+    labs(x="",y="")
   
   data_XY <- data.frame(results = results$covariances$XY, x = rep("Cov(X,Y)", n))
   cov_XY <- ggplot(data_XY, aes(y = results, x = x)) + 
     geom_violin() +
     geom_segment(aes(x = 0.5, xend = 1.5, y = true_XY, yend = true_XY),
                  color = 'red',
-                 linewidth = 1)
+                 linewidth = 1)+
+    labs(x="",y="")
   
   data_MY <- data.frame(results = results$covariances$MY, x = rep("Cov(M,Y)", n))
   cov_MY <- ggplot(data_MY, aes(y = results, x = x)) + 
     geom_violin()  +
     geom_segment(aes(x = 0.5, xend = 1.5, y = true_MY, yend = true_MY),
                  color = 'red',
-                 linewidth = 1)
+                 linewidth = 1)+
+    labs(x="",y="")
   
   param_estimates <- data.frame(alpha = results$params_x$alpha, beta1 = results$params_m$beta1, beta2 = results$params_m$beta2, eta1 = results$params_y$eta1, eta2 = results$params_y$eta2, eta3 = results$params_y$eta3)
   cov_matrix <- cov(param_estimates)
@@ -127,7 +130,7 @@ arx_plotting <- function(results){
                   panel.grid = element_blank()
                 ) +
                 coord_fixed() +
-                labs(title = "Covariance Matrix Heatmap",
+                labs(title = "Covariance Matrix Heatmap", y ="", x="",
                      subtitle =bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
   
   indirect_obs <- results$params_y$eta2 * results$params_m$beta2
@@ -143,9 +146,9 @@ arx_plotting <- function(results){
                  linewidth = 1) + 
     geom_segment(aes(x = 2.5, xend = 3.5, y = CMDE_true, yend = CMDE_true, color = "Theoretical Effect"),
                  linewidth = 1) +
-    labs(title = "Observed Effects from AR based Method", 
+    labs(title = "Observed Effects from AR based Method", y = "", x = "",
          subtitle = bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3]))) +
-    scale_color_manual(values = c("Theoretical Effect" = 'red'))
+    scale_color_manual(name = NULL, values = c("Theoretical Effect" = 'red'))
   
   covs <- cov_XM+cov_XY+cov_MY + plot_annotation(title = "Observed covariances with Theoretical Value",
                                                  subtitle = bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
