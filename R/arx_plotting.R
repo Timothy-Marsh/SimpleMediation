@@ -138,7 +138,7 @@ arx_plotting <- function(results){
   CMDE_obs <- results$params_y$eta1 * results$params_y$eta3
   
   effects_df <- data.frame(results = c(indirect_obs, SMDE_obs, CMDE_obs), Effects = c(rep("Indirect", length(indirect_obs)), rep("SMDE", length(indirect_obs)), rep("CMDE",length(indirect_obs))))
-  effects_plot <- ggplot(effects_df, aes(x = Effects, y = results)) +
+  effects_plot <- ggplot(effects_df, aes(x = factor(Effects, levels = c("Indirect", "SMDE", "CMDE")), y = results)) +
     geom_violin() +
     geom_segment(aes(x = 0.5, xend = 1.5, y = indirect_true, yend = indirect_true,color = "Theoretical Effect"),
                  linewidth = 1) + 

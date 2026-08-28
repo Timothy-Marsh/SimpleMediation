@@ -25,7 +25,6 @@ simulation_study <- function(parameters = list(list(alpha = 0.3, beta = c(0.2,0.
                                                list(alpha = 0.8, beta = c(0.4,0.3), eta = c(0.7,0.145,0.1)),
                                                list(alpha = 0.3, beta = c(0.3,0.4), eta = c(0.3,0.4,0.5)),
                                                list(alpha = 0.7, beta = c(0.6,0.4), eta = c(0.7,0.6,0.9)),
-                                               list(alpha = 0.6, beta = c(0.6,0.6), eta = c(0.6,0.6,0.6)),
                                                list(alpha = 0.5, beta = c(0.2,0.8), eta = c(0.3,0.4,0.5))), sample_length = 500, sample_reps = 100){
   n <- length(parameters)
   
