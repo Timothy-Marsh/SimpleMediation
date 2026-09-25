@@ -24,13 +24,13 @@ arx_plotting <- function(results){
            y = "alpha")
     
     n <- length(results$params_m$beta1)
-    data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
+    data_beta <- data.frame(var = c(rep("beta_0", n), rep("beta_1",n)), results = c(results$params_m$beta1,results$params_m$beta2))
     betas <- ggplot(data_beta, aes(x=var, y=results)) + 
       geom_violin() + 
       labs(title = "Violin plot of Beta estimates",
            y = "Beta")
     
-    data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
+    data_eta <- data.frame(var = c(rep("eta_0", n), rep("eta_1",n), rep("eta_2",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
     etas <- ggplot(data_eta, aes(x=var, y=results)) + 
       geom_violin() + 
       labs(title = "Violin plot of Eta estimates",
@@ -58,7 +58,7 @@ arx_plotting <- function(results){
     labs( y = "alpha",x = "")
   
   n <- length(results$params_m$beta1)
-  data_beta <- data.frame(var = c(rep("beta_1", n), rep("beta_2",n)), results = c(results$params_m$beta1,results$params_m$beta2))
+  data_beta <- data.frame(var = c(rep("beta_0", n), rep("beta_1",n)), results = c(results$params_m$beta1,results$params_m$beta2))
   betas <- ggplot(data_beta, aes(x=var, y=results)) + 
     geom_violin() + 
     #geom_boxplot() +
@@ -70,7 +70,7 @@ arx_plotting <- function(results){
                  linewidth = 1) +
     labs( y = "Beta", x = "")
   
-  data_eta <- data.frame(var = c(rep("eta_1", n), rep("eta_2",n), rep("eta_3",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
+  data_eta <- data.frame(var = c(rep("eta_0", n), rep("eta_1",n), rep("eta_2",n)), results = c(results$params_y$eta1,results$params_y$eta2, results$params_y$eta3))
   etas <- ggplot(data_eta, aes(x=var, y=results)) + 
     geom_violin() + 
     #geom_boxplot() +
@@ -85,10 +85,17 @@ arx_plotting <- function(results){
                  linewidth = 1) +
     labs(y = "Eta",x = "")
   
+  b0 <- beta_true[1]
+  b1 <- beta_true[2]
+  e0 <- eta_true[1]
+  e1 <- eta_true[2]
+  e2 <- eta_true[3]
+  
   true_XM <- (beta_true[2]*alpha_true)/((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)))
   true_XY <- ((eta_true[2]^2 * beta_true[2] * eta_true[3])+(eta_true[3]*alpha_true * (1-(beta_true[1]*alpha_true)))) / ((1-alpha_true^2) * (1-(beta_true[1]*alpha_true)) * (1-(eta_true[1]*alpha_true)))
-  true_MY <- (eta_true[2]*beta_true[1])/((1-beta_true[1]^2) * (1-(eta_true[1]*beta_true[1]))) + ((beta_true[1]*(beta_true[2]^2)*eta_true[2] + beta_true[2]*eta_true[3]*(1-(beta_true[1]^2))) / ((1-(alpha_true^2))*(1-(beta_true[1]^2))*(1-(beta_true[1]*eta_true[1])))) + ((alpha_true*beta_true[1]*beta_true[2]*eta_true[3]+alpha_true*beta_true[2]*eta_true[1]*eta_true[3]+alpha_true*(beta_true[2]^2)*eta_true[2]-2*(alpha_true^2)*beta_true[1]*beta_true[2]*eta_true[1]*eta_true[3]) / ((1-(alpha_true^2)) * (1-(beta_true[1]*eta_true[1])) * (1-(alpha_true*beta_true[1])) * (1-(alpha_true*eta_true[1]))))
-    
+  #true_MY <- (eta_true[2]*beta_true[1])/((1-beta_true[1]^2) * (1-(eta_true[1]*beta_true[1]))) + ((beta_true[1]*(beta_true[2]^2)*eta_true[2] + beta_true[2]*eta_true[3]*(1-(beta_true[1]^2))) / ((1-(alpha_true^2))*(1-(beta_true[1]^2))*(1-(beta_true[1]*eta_true[1])))) + ((alpha_true*beta_true[1]*beta_true[2]*eta_true[3]+alpha_true*beta_true[2]*eta_true[1]*eta_true[3]+alpha_true*(beta_true[2]^2)*eta_true[2]-2*(alpha_true^2)*beta_true[1]*beta_true[2]*eta_true[1]*eta_true[3]) / ((1-(alpha_true^2)) * (1-(beta_true[1]*eta_true[1])) * (1-(alpha_true*beta_true[1])) * (1-(alpha_true*eta_true[1]))))
+  true_MY <- (eta_true[2]*beta_true[1])/((1-beta_true[1]^2) * (1-(eta_true[1]*beta_true[1]))) + ((beta_true[1]*(beta_true[2]^2)*eta_true[2] * (1+(alpha_true*beta_true[1]))) / ((1-(alpha_true*beta_true[1]))*(1-(alpha_true^2))*(1-(beta_true[1]^2))*(1-(beta_true[1]*eta_true[1])))) + (((b1*e2) + (alpha_true*(b1^2)*e1) - ((alpha_true^2)*b0*b1*e0*e2)) / ((1-(alpha_true^2)) * (1-(beta_true[1]*eta_true[1])) * (1-(alpha_true*beta_true[1])) * (1-(alpha_true*eta_true[1]))))
+  
   data_XM <- data.frame(results = results$covariances$XM, x = rep("Cov(X,M)", n))
   cov_XM <- ggplot(data_XM, aes(y = results, x = x)) + 
     geom_violin() +
@@ -113,16 +120,21 @@ arx_plotting <- function(results){
                  linewidth = 1)+
     labs(x="",y="")
   
-  param_estimates <- data.frame(alpha = results$params_x$alpha, beta1 = results$params_m$beta1, beta2 = results$params_m$beta2, eta1 = results$params_y$eta1, eta2 = results$params_y$eta2, eta3 = results$params_y$eta3)
-  cov_matrix <- cov(param_estimates)
-  cov_df <- as.data.frame(as.table(cov_matrix))
-  names(cov_df) <- c("Var1", "Var2", "Covariance")
+  # param_estimates <- data.frame(alpha = results$params_x$alpha, beta1 = results$params_m$beta1, beta2 = results$params_m$beta2, eta1 = results$params_y$eta1, eta2 = results$params_y$eta2, eta3 = results$params_y$eta3)
+  # cov_matrix <- cov(param_estimates)
+  # cov_df <- as.data.frame(as.table(cov_matrix))
+  # names(cov_df) <- c("Var1", "Var2", "Covariance")
   
-  cov_plot <- ggplot(cov_df, aes(x = Var1, y = Var2, fill = Covariance)) + 
+  param_estimates <- data.frame(alpha = results$params_x$alpha, beta1 = results$params_m$beta1, beta2 = results$params_m$beta2, eta1 = results$params_y$eta1, eta2 = results$params_y$eta2, eta3 = results$params_y$eta3)
+  corr_matrix <- cor(param_estimates)
+  corr_df <- as.data.frame(as.table(corr_matrix))
+  names(corr_df) <- c("Var1", "Var2", "Correlation")
+  
+  cov_plot <- ggplot(corr_df, aes(x = Var1, y = Var2, fill = Correlation)) + 
                 geom_tile(color = "white") +
                 scale_fill_gradient2(
                   low = "blue", mid = "white", high = "red", midpoint = 0,
-                  name = "Covariance"
+                  name = "Correlation"
                 ) +
                 theme_minimal(base_size = 14) +
                 theme(
@@ -130,7 +142,7 @@ arx_plotting <- function(results){
                   panel.grid = element_blank()
                 ) +
                 coord_fixed() +
-                labs(title = "Covariance Matrix Heatmap", y ="", x="",
+                labs(title = "Correlation Matrix Heatmap", y ="", x="",
                      subtitle =bquote(alpha == .(alpha_true) ~ ", " ~ beta[0] == .(beta_true[1])~ ", " ~ beta[1] == .(beta_true[2])~ ", " ~ eta[0] == .(eta_true[1])~ ", " ~ eta[1] == .(eta_true[2])~ ", " ~ eta[2] == .(eta_true[3])))
   
   indirect_obs <- results$params_y$eta2 * results$params_m$beta2
